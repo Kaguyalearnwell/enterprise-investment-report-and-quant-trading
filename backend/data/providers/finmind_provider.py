@@ -272,3 +272,75 @@ class FinMindProvider(DataProvider):
             "raw_payload": json.dumps({"dataset": dataset, **r}, ensure_ascii=False),
             "source": SOURCE,
         }
+
+
+# ---- fundamentals (Stage 6.2; datasets verified in Stage 6.1) --------------------------------------
+STATEMENT_DATASETS = {"income": "TaiwanStockFinancialStatements", "balance": "TaiwanStockBalanceSheet",
+                      "cashflow": "TaiwanStockCashFlowsStatement"}
+
+
+def _statements(self, stock_id: str, start: str, end: str, statement: str) -> FetchResult:
+    raw, status = self._request(STATEMENT_DATASETS[statement], data_id=stock_id, start_date=start, end_date=end)
+    df = pd.DataFrame(raw)
+    if df.empty:
+        return FetchResult(df, raw, status, SOURCE)
+    out = pd.DataFrame({"stock_id": df["stock_id"].astype(str), "period_end": df["date"], "statement": statement,
+                        "item": df["type"], "value": pd.to_numeric(df["value"], errors="coerce"),
+                        "origin_name": df.get("origin_name"), "source": SOURCE})
+    out = out.drop_duplicates(["stock_id", "period_end", "statement", "item"], keep="last")
+    return FetchResult(out.astype(object).where(out.notna(), None), raw, status, SOURCE)
+
+
+def _month_revenue(self, stock_id: str, start: str, end: str) -> FetchResult:
+    raw, status = self._request("TaiwanStockMonthRevenue", data_id=stock_id, start_date=start, end_date=end)
+    df = pd.DataFrame(raw)
+    if df.empty:
+        return FetchResult(df, raw, status, SOURCE)
+    out = pd.DataFrame({"stock_id": df["stock_id"].astype(str),
+                        "revenue_month": [f"{int(y)}-{int(m):02d}" for y, m in zip(df["revenue_year"], df["revenue_month"])],
+                        "revenue": pd.to_numeric(df["revenue"], errors="coerce"),
+                        "create_time": df.get("create_time", ""), "source": SOURCE})
+    return FetchResult(out.drop_duplicates(["stock_id", "revenue_month"], keep="last"), raw, status, SOURCE)
+
+
+def _dividend_policy(self, stock_id: str, start: str, end: str) -> FetchResult:
+    """`date` in this dataset can lie in the future (Stage 6.1): request without an end date and keep rows
+    whose ANNOUNCEMENT date is on or before `end`."""
+    raw, status = self._request("TaiwanStockDividend", data_id=stock_id, start_date=start)
+    rows = []
+    for r in raw:
+        ad = (r.get("AnnouncementDate") or "")[:10]
+        if not ad or ad > end:
+            continue
+        num = lambda k: float(r.get(k) or 0.0)  # noqa: E731
+        ex = lambda k: (r.get(k) or "")[:10] or None  # noqa: E731
+        rows.append({"stock_id": str(r["stock_id"]), "announcement_date": ad,
+                     "announcement_time": r.get("AnnouncementTime") or None, "period_label": str(r.get("year") or ""),
+                     "cash_dividend": num("CashEarningsDistribution") + num("CashStatutorySurplus"),
+                     "stock_dividend": num("StockEarningsDistribution") + num("StockStatutorySurplus"),
+                     "cash_ex_date": ex("CashExDividendTradingDate"), "stock_ex_date": ex("StockExDividendTradingDate"),
+                     "cash_payment_date": ex("CashDividendPaymentDate"),
+                     "raw_payload": json.dumps(r, ensure_ascii=False), "source": SOURCE})
+    df = pd.DataFrame(rows)
+    if not df.empty:
+        df = df.drop_duplicates(["stock_id", "announcement_date", "period_label"], keep="last")
+    return FetchResult(df, raw, status, SOURCE)
+
+
+def _valuation(self, stock_id: str, start: str, end: str) -> FetchResult:
+    raw, status = self._request("TaiwanStockPER", data_id=stock_id, start_date=start, end_date=end)
+    df = pd.DataFrame(raw)
+    if df.empty:
+        return FetchResult(df, raw, status, SOURCE)
+    out = pd.DataFrame({"stock_id": df["stock_id"].astype(str), "date": df["date"],
+                        "per": pd.to_numeric(df["PER"], errors="coerce"), "pbr": pd.to_numeric(df["PBR"], errors="coerce"),
+                        "dividend_yield": pd.to_numeric(df["dividend_yield"], errors="coerce"), "source": SOURCE})
+    return FetchResult(out.astype(object).where(out.notna(), None), raw, status, SOURCE)
+
+
+FinMindProvider.income_statements = lambda self, s, a, b: _statements(self, s, a, b, "income")
+FinMindProvider.balance_sheets = lambda self, s, a, b: _statements(self, s, a, b, "balance")
+FinMindProvider.cash_flows = lambda self, s, a, b: _statements(self, s, a, b, "cashflow")
+FinMindProvider.month_revenue = _month_revenue
+FinMindProvider.dividend_policy = _dividend_policy
+FinMindProvider.valuation = _valuation

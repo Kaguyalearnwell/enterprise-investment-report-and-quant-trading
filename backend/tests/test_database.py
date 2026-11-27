@@ -47,12 +47,12 @@ def test_all_required_tables_and_views_exist(db):
     assert set(REQUIRED_TABLES) <= set(db.tables())
     views = {r[0] for r in db.conn.execute("SELECT name FROM sqlite_master WHERE type='view'")}
     assert set(REQUIRED_VIEWS) <= views
-    assert db.schema_version == 6
+    assert db.schema_version == 7
 
 
 def test_migrations_are_idempotent(db):
     assert db.initialize() == []
-    assert db.schema_version == 6
+    assert db.schema_version == 7
 
 
 def test_upgrade_v1_to_v2_keeps_data(tmp_path):
@@ -65,7 +65,7 @@ def test_upgrade_v1_to_v2_keeps_data(tmp_path):
     conn.execute("INSERT INTO market_calendar VALUES ('2026-11-26','TWSE',1,'regular','t',?)", (NOW,))
     conn.close()
     d = DatabaseManager(path)
-    assert d.initialize() == [2, 3, 4, 5, 6]
+    assert d.initialize() == [2, 3, 4, 5, 6, 7]
     assert d.completed_downloads("TaiwanStockPrice").stock_id.tolist() == ["2330"]
     assert d.get_trading_days("2026-01-01", "2026-12-31", as_of="2026-11-27") == ["2026-11-26"]
     assert "download_log" not in d.tables() and "market_calendar" not in d.tables()

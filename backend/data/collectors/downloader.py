@@ -43,7 +43,15 @@ DATASETS = {
     "prices": ("daily_prices", "daily_prices_raw", "TaiwanStockPrice", 7),
     "dividends": ("dividends", "corporate_actions", "TaiwanStockDividendResult", 60),
     "capital_reductions": ("capital_reductions", "corporate_actions", "TaiwanStockCapitalReductionReferencePrice", 60),
+    # fundamentals (Stage 6.2): statements can be restated / filed late -> long overlap window
+    "income": ("income_statements", "financial_statements", "TaiwanStockFinancialStatements", 400),
+    "balance": ("balance_sheets", "financial_statements", "TaiwanStockBalanceSheet", 400),
+    "cashflow": ("cash_flows", "financial_statements", "TaiwanStockCashFlowsStatement", 400),
+    "revenue": ("month_revenue", "monthly_revenue", "TaiwanStockMonthRevenue", 62),
+    "dividend_policy": ("dividend_policy", "dividend_policy", "TaiwanStockDividend", 400),
+    "per": ("valuation", "valuation_daily", "TaiwanStockPER", 7),
 }
+FUNDAMENTAL_TABLES = {"financial_statements", "monthly_revenue", "dividend_policy"}
 
 
 TAIPEI = dt.timezone(dt.timedelta(hours=8))
@@ -86,10 +94,36 @@ class RunSummary:
 
 class Downloader:
     def __init__(self, db: DatabaseManager, provider: DataProvider, raw_dir: Path | None = None,
-                 as_of: str | None = None, clock: Callable[[], float] = time.monotonic):
+                 as_of: str | None = None, clock: Callable[[], float] = time.monotonic,
+                 fundamentals_cfg: dict | None = None):
         self.db, self.provider, self.raw_dir = db, provider, raw_dir
         self.as_of = as_of or default_as_of()
         self._clock = clock
+        if fundamentals_cfg is None:
+            from backend.config.strategy_config import load_config
+
+            fundamentals_cfg = load_config()["fundamentals"]
+        self.fcfg = fundamentals_cfg
+        self._calendar = None
+
+    def _with_availability(self, table: str, df: pd.DataFrame) -> pd.DataFrame:
+        """Attach available_from / availability_basis (point-in-time rules, backend/data/normalizers/availability.py)."""
+        from backend.data.normalizers import availability as av
+
+        if self._calendar is None:
+            self._calendar = av.Calendar(self.db.get_trading_days("1990-01-01", "2100-12-31", as_of="2100-12-31"))
+        cal, c = self._calendar, self.fcfg
+        if table == "financial_statements":
+            pairs = [av.statement_available(p, cal, c) for p in df["period_end"]]
+        elif table == "monthly_revenue":
+            pairs = [av.revenue_available(m, t, cal, c) for m, t in zip(df["revenue_month"], df["create_time"])]
+        else:
+            pairs = [av.announcement_available(d, t, cal, c) for d, t in zip(df["announcement_date"], df["announcement_time"])]
+        out = df.assign(available_from=[p[0] for p in pairs], availability_basis=[p[1] for p in pairs])
+        dropped = out["available_from"].isna().sum()
+        if dropped:      # beyond the known calendar: not usable yet; kept out until a later run
+            log.info("%s: %d rows not yet available (date beyond the trading calendar)", table, dropped)
+        return out[out["available_from"].notna()]
 
     # ---- raw archive -----------------------------------------------------------------
     def _archive(self, dataset: str, key: str, start: str, end: str, res: FetchResult) -> None:
@@ -258,7 +292,12 @@ class Downloader:
             return
         if table == "daily_prices_raw":
             self._ensure_master(sid)
-        up = self.db.upsert(table, self._stamp(res.data))
+        data = self._with_availability(table, res.data) if table in FUNDAMENTAL_TABLES else res.data
+        if data.empty:
+            summary.empty += 1
+            self.db.log_download(log_name, sid, s, e, "empty", http_status=res.http_status)
+            return
+        up = self.db.upsert(table, self._stamp(data))
         summary.rows_inserted += up.inserted
         summary.rows_updated += up.updated
         if table == "daily_prices_raw":

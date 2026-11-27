@@ -46,7 +46,8 @@ def _parser() -> argparse.ArgumentParser:
     sub.add_parser("status", help="row counts and download log summary")
 
     d = sub.add_parser("download", help="download data (incremental, resumable)")
-    d.add_argument("what", choices=["reference", "prices", "dividends", "capital-reductions", "all"])
+    d.add_argument("what", choices=["reference", "prices", "dividends", "capital-reductions", "all", "income", "balance",
+                                    "cashflow", "revenue", "dividend-policy", "per", "fundamentals"])
     g = d.add_mutually_exclusive_group()
     g.add_argument("--stocks", nargs="+", help="stock ids")
     g.add_argument("--all", action="store_true", help="whole universe from security_master")
@@ -210,7 +211,9 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     if args.limit:
         stocks = stocks[: args.limit]
-    datasets = ["prices", "dividends"] if what == "all" else [what.replace("-", "_")]
+    datasets = (["prices", "dividends"] if what == "all" else
+                ["income", "balance", "cashflow", "revenue", "dividend_policy", "per"] if what == "fundamentals"
+                else [what.replace("-", "_")])
     rc = 0
     for ds in datasets:
         assert ds in DATASETS

@@ -688,3 +688,79 @@ SCHEMA_V6: list[str] = [
     """,
 ]
 REQUIRED_TABLES = REQUIRED_TABLES + ("experiment_registry", "experiment_trials")
+
+
+# =====================================================================================
+# Schema v7 (Stage 6.2): fundamental data. Every row carries `available_from`: the first
+# trading day on which the value may be used by a research decision (point-in-time), and
+# `availability_basis` saying how that date was derived. FinMind gives no announcement date
+# for statements (Stage 6.1), so statutory deadlines are used; see backend/data/normalizers/availability.py.
+# =====================================================================================
+_AVAIL = "availability_basis TEXT NOT NULL CHECK (availability_basis IN ('statutory_deadline','create_time','fallback_rule','announcement'))"
+SCHEMA_V7: list[str] = [
+    f"""
+    CREATE TABLE financial_statements (
+        stock_id     TEXT NOT NULL,
+        {_date('period_end')},
+        statement    TEXT NOT NULL CHECK (statement IN ('income','balance','cashflow')),
+        item         TEXT NOT NULL,
+        value        REAL,
+        origin_name  TEXT,
+        {_date('available_from')},
+        {_AVAIL},
+        source       TEXT NOT NULL,
+        {_ts('ingested_at')},
+        PRIMARY KEY (stock_id, period_end, statement, item)
+    ) STRICT, WITHOUT ROWID
+    """,
+    "CREATE INDEX ix_fin_available ON financial_statements (stock_id, available_from)",
+    f"""
+    CREATE TABLE monthly_revenue (
+        stock_id      TEXT NOT NULL,
+        revenue_month TEXT NOT NULL CHECK (revenue_month GLOB '[12][0-9][0-9][0-9]-[01][0-9]'),
+        revenue       REAL,
+        create_time   TEXT,
+        {_date('available_from')},
+        {_AVAIL},
+        source        TEXT NOT NULL,
+        {_ts('ingested_at')},
+        PRIMARY KEY (stock_id, revenue_month)
+    ) STRICT, WITHOUT ROWID
+    """,
+    f"""
+    CREATE TABLE dividend_policy (
+        stock_id          TEXT NOT NULL,
+        {_date('announcement_date')},
+        announcement_time TEXT,
+        period_label      TEXT NOT NULL,
+        cash_dividend     REAL,
+        stock_dividend    REAL,
+        {_date('cash_ex_date', True)},
+        {_date('stock_ex_date', True)},
+        {_date('cash_payment_date', True)},
+        raw_payload       TEXT NOT NULL CHECK (json_valid(raw_payload)),
+        {_date('available_from')},
+        {_AVAIL},
+        source            TEXT NOT NULL,
+        {_ts('ingested_at')},
+        PRIMARY KEY (stock_id, announcement_date, period_label)
+    ) STRICT
+    """,
+    f"""
+    CREATE TABLE valuation_daily (
+        stock_id TEXT NOT NULL,
+        {_date('date')},
+        per REAL, pbr REAL, dividend_yield REAL,
+        source TEXT NOT NULL,
+        {_ts('ingested_at')},
+        PRIMARY KEY (stock_id, date)
+    ) STRICT, WITHOUT ROWID
+    """,
+]
+TABLE_KEYS.update({
+    "financial_statements": ("stock_id", "period_end", "statement", "item"),
+    "monthly_revenue": ("stock_id", "revenue_month"),
+    "dividend_policy": ("stock_id", "announcement_date", "period_label"),
+    "valuation_daily": ("stock_id", "date"),
+})
+REQUIRED_TABLES = REQUIRED_TABLES + ("financial_statements", "monthly_revenue", "dividend_policy", "valuation_daily")

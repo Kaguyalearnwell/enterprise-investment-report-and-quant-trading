@@ -303,3 +303,17 @@ class DatabaseManager:
                  ON x.stock_id = v.stock_id AND x.m = v.created_at""")
         df = df.drop_duplicates("stock_id", keep="last")
         return df[df["stock_id"].isin(stock_ids)] if stock_ids else df
+
+    # ---- point-in-time fundamentals (Stage 6.2) ------------------------------------------------
+    def statements_as_of(self, stock_id: str, as_of: str, statement: str | None = None) -> pd.DataFrame:
+        """Statement rows that a decision at the close of `as_of` was allowed to know."""
+        sql = "SELECT * FROM financial_statements WHERE stock_id = ? AND available_from <= ?"
+        params: list[Any] = [stock_id, as_of]
+        if statement:
+            sql += " AND statement = ?"
+            params.append(statement)
+        return self.read_sql(sql + " ORDER BY period_end, statement, item", params)
+
+    def revenue_as_of(self, stock_id: str, as_of: str) -> pd.DataFrame:
+        return self.read_sql("SELECT * FROM monthly_revenue WHERE stock_id = ? AND available_from <= ? "
+                             "ORDER BY revenue_month", (stock_id, as_of))

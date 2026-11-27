@@ -87,3 +87,10 @@ trailing_basis = "adjusted"           # user decision C1: track highest close on
 delisted_exit = "last_close"          # position in a delisted stock is closed at its last published close
 risk_free_rate = 0.0                  # annual, for Sharpe / Sortino
 require_quality_verdict = true        # stocks without a PASS/WARNING verdict are excluded (Prompt 04 §14.2)
+
+[fundamentals]
+# Point-in-time availability (Stage 6.1 evidence). Research defaults - TO BE CONFIRMED by the user.
+quarterly_deadlines = ["05-15", "08-14", "11-14"]   # Q1, Q2, Q3: 45 days after quarter end (Securities and Exchange Act art. 36)
+annual_deadline = "03-31"                            # annual report: 3 months after year end
+revenue_fallback_day = 20      # month revenue without create_time: usable after the 20th of the next month (observed max 20)
+announcement_cutoff = "13:30"  # announced at/after the close -> usable from the next trading day
