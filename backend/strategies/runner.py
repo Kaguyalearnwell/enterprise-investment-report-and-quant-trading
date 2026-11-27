@@ -26,7 +26,7 @@ from backend.database.schema import CONDITION_BITS, ENTRY_BITS
 from backend.strategies.fib_bb_weekly import VERSIONS, compute_features, entry_signals
 
 log = logging.getLogger(__name__)
-CODE_VERSION = "fib_bb_weekly/1"
+CODE_VERSION = "fib_bb_weekly/2"   # /2: percent_rank decides ties by value (relative tolerance 1e-9)
 CLOSE_TIME = "T13:30:00+08:00"
 INDICATOR_SECTIONS = ("trend", "bollinger", "weekly")
 

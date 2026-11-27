@@ -50,7 +50,8 @@ def ref_indicators(d: pd.DataFrame) -> pd.DataFrame:
     for i in range(n):
         if i >= 120 and not np.isnan(out["bbw"][i - 120]):
             prev = out["bbw"][i - 120:i]
-            out["bbw_pct"][i] = 100.0 * sum(1 for x in prev if x <= out["bbw"][i]) / 120
+            cur = out["bbw"][i]
+            out["bbw_pct"][i] = 100.0 * sum(1 for x in prev if x <= cur + 1e-9 * abs(cur)) / 120   # ties by value
     tr = [h[0] - lo[0]] + [max(h[i] - lo[i], abs(h[i] - c[i - 1]), abs(lo[i] - c[i - 1])) for i in range(1, n)]
     if n >= 14:
         a = sum(tr[:14]) / 14

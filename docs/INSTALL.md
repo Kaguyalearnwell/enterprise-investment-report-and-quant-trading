@@ -1,7 +1,7 @@
 # 安裝與資料建置手冊（在你的電腦上執行）
 
 > 本系統只做研究、分析與歷史模擬，**不進行任何真實交易**。
-> 目前完成到 Stage 2（資料管線）。Dashboard 在 Stage 6 才會完成。
+> 目前完成到 Stage 3（指標與策略訊號）。Dashboard 在 Stage 9 才會完成。
 
 ## 1. 需要的東西
 
@@ -45,6 +45,7 @@ python -m backend.cli download prices --all      # 全市場日線（約 2,300 �
 python -m backend.cli download dividends --all   # 全市場除權息（約 2,300 次請求）
 python -m backend.cli process --all              # 還原價、漲跌停、停牌推斷、週線
 python -m backend.cli validate --all             # 資料品質報告 -> reports/data_quality/
+python -m backend.cli signals compute --all      # 指標與策略訊號（約 15 分鐘）
 python -m backend.cli version "initial full load"
 python -m backend.cli status                     # 查看各資料表筆數與下載狀態
 ```
@@ -66,6 +67,8 @@ python -m backend.cli download prices --all
 python -m backend.cli download dividends --all
 python -m backend.cli process --all
 python -m backend.cli validate --all
+python -m backend.cli signals compute --all
+python -m backend.cli signals list
 python -m backend.cli version "daily update"
 ```
 

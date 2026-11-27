@@ -58,11 +58,18 @@ def wilder_atr(high: pd.Series, low: pd.Series, close: pd.Series, n: int = 14) -
     return rma(true_range(high, low, close), n)
 
 
-def percent_rank(s: pd.Series, n: int) -> pd.Series:
+TIE_RTOL = 1e-9
+
+
+def percent_rank(s: pd.Series, n: int, rtol: float = TIE_RTOL) -> pd.Series:
     """Percent (0-100) of the previous n values that are <= the current value.
 
     The current bar is NOT part of the comparison window: window = [t-n, t-1].
     NaN until n previous valid values exist, or if any of them is NaN.
+    Values equal within a relative tolerance count as ties (<=): mathematically equal
+    Bandwidths computed in a different summation order differ in the last bits, and an
+    exact comparison would then decide the tie by rounding noise (Stage 3, real 2330 data:
+    12 of 3,254 days were affected).
     """
     x = s.to_numpy(dtype=float)
     out = np.full_like(x, np.nan)
@@ -70,7 +77,7 @@ def percent_rank(s: pd.Series, n: int) -> pd.Series:
         prev = sliding_window_view(x[:-1], n)          # row j covers bars [j, j+n-1]
         cur = x[n:]                                   # bar j+n
         with np.errstate(invalid="ignore"):
-            pct = (prev <= cur[:, None]).sum(axis=1) * 100.0 / n
+            pct = (prev <= cur[:, None] + rtol * np.abs(cur[:, None])).sum(axis=1) * 100.0 / n
         bad = np.isnan(prev).any(axis=1) | np.isnan(cur)
         pct[bad] = np.nan
         out[n:] = pct

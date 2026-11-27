@@ -1,6 +1,6 @@
 # 台股量化研究系統 使用說明書
 
-> 版本：Stage 2 完成（2026-11-27）｜適用分支：`claude/trusting-gauss-pam41z`
+> 版本：Stage 3 完成（2026-11-27）｜適用分支：`claude/trusting-gauss-pam41z`
 > 安裝步驟的完整細節另見 [`docs/INSTALL.md`](INSTALL.md)。
 
 ---
@@ -37,7 +37,7 @@
 
 ## 2. 目前能用的功能
 
-系統分 7 個階段開發，**目前完成 Stage 2（資料庫與資料管線）**。
+系統分階段開發，**目前完成 Stage 3（指標與策略訊號）**。開發順序見 `docs/prompt04_gap_analysis.md` §F。
 
 | 功能 | 狀態 | 說明 |
 |---|---|---|
@@ -46,14 +46,15 @@
 | 還原價、漲跌停價、停牌推斷、週 K | ✅ 可用 | `process` |
 | 資料品質檢查與報告 | ✅ 可用 | `validate` |
 | 倖存者偏誤稽核（上櫃） | ✅ 可用 | `audit-survivorship` |
-| 指標與策略訊號（SMA13/34/55、布林壓縮、週線濾網） | 🟡 程式與測試已完成，尚未接上資料庫 | Stage 3 |
-| 歷史回測、投資組合模擬 | ⏳ 尚未開始 | Stage 4 |
+| 指標與策略訊號（SMA13/34/55、布林壓縮、週線濾網，A–E、S0，兩種成交量定義） | ✅ 可用 | `signals compute / list / explain` |
+| 歷史回測、投資組合模擬（個股與全市場分開） | ⏳ 尚未開始 | Stage 4 |
 | 2×2 因子、消融、隨機基準、DSR、PBO 等統計驗證 | ⏳ 尚未開始 | Stage 5 |
-| 網頁 Dashboard、報表匯出 | ⏳ 尚未開始 | Stage 6 |
+| 基本面資料、企業與成長評級、估值、進場時機整合 | ⏳ 尚未開始 | Stage 6–8 |
+| 網頁 Dashboard、報表匯出 | ⏳ 尚未開始 | Stage 9 |
 | TradingView Pine Script 指標 | ⏳ 尚未開始 | Stage 3 之後 |
 | 籌碼資料手動匯入 | ⏳ 資料表已建立，匯入介面尚未開發 | 你的 APP 無匯出功能，只會做手動匯入 |
 
-**現階段你可以做的事**：建立全市場資料庫、每天更新、檢查資料品質，讓 Stage 3 以後的研究有可靠的資料基礎。
+**現階段你可以做的事**：建立全市場資料庫、每天更新、檢查資料品質，並查看每日符合策略條件的股票與每個條件的判斷過程。
 
 ---
 
@@ -118,6 +119,7 @@ python -m backend.cli download prices --all       # 約 2,300 次請求
 python -m backend.cli download dividends --all    # 約 2,300 次請求
 python -m backend.cli process --all
 python -m backend.cli validate --all
+python -m backend.cli signals compute --all      # 指標與訊號（全市場約 15 分鐘）
 python -m backend.cli version "initial full load"
 ```
 
@@ -145,6 +147,8 @@ python -m backend.cli download prices --all
 python -m backend.cli download dividends --all
 python -m backend.cli process --all
 python -m backend.cli validate --all
+python -m backend.cli signals compute --all
+python -m backend.cli signals list               # 最新一天的 E 版本研究訊號
 python -m backend.cli version "daily update"
 ```
 
@@ -200,7 +204,19 @@ python -m backend.cli download <類型> [--stocks 代號 ... | --all] [選項]
 
 > 起始日 2013-01-01 是刻意的：週線 SMA55 需要約 57 週暖機，才能從 2015 年開始回測。
 
-### 6.3 處理、驗證、稽核
+### 6.3 策略訊號
+
+| 指令 | 作用 |
+|---|---|
+| `signals compute --stocks ... / --all` | 計算指標與 A–E、S0 訊號；兩種成交量定義各存成一個策略版本 |
+| `signals list [--date 日期] [--version E] [--volume-mode include_today] [--csv 檔名]` | 某天符合條件的股票（預設最新一天、E 版本）；可匯出 CSV（Excel 可直接開啟） |
+| `signals explain 代號 日期 [--volume-mode ...]` | 該股票該天每個條件的規則、輸入值、是否成立 |
+
+> 選股清單是**研究訊號**：t 日收盤後才成立，模擬進場最早是 `earliest_entry_date`（下一交易日）開盤。表中的「參考停損 = 收盤 − 2.5 × ATR」只是參考，實際停損以進場價計算。
+
+成交量兩種定義（Prompt 04 §8.2）：`include_today` = 當日量 > 1.5 × 含當日的 20 日均量（正式定義，與 TradingView 一致）；`prior_20` = 當日量 > 1.5 × 前 20 個完整交易日均量。
+
+### 6.4 處理、驗證、稽核
 
 | 指令 | 作用 | 輸出 |
 |---|---|---|
@@ -305,6 +321,9 @@ pd.read_sql("""SELECT week_key, week_end, close FROM weekly_prices
 | `corporate_actions` | 公司行動；`dividend_history`、`stock_split_history`、`capital_reduction_history` 為其檢視表 |
 | `price_limits` | 每日漲跌停價（`basis` 標示來源：自算或官方） |
 | `trading_status`、`suspension_history` | 無價日與推斷的停牌期間 |
+| `strategy_versions` | 策略參數快照（參數或公式一改就是新版本，舊版保留） |
+| `technical_indicators` | 每檔每日指標值 |
+| `strategy_signals`、`strategy_signals_readable` | 每檔每日每個條件是否成立、各版本是否進場；後者為可直接閱讀的檢視表 |
 | `trading_calendar` | 交易日曆 |
 | `data_validation_log` | 每次資料品質檢查的問題 |
 | `data_revisions` | 被資料商修正過的舊值 |

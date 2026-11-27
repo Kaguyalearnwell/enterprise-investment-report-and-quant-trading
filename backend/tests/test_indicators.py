@@ -69,6 +69,14 @@ def test_percent_rank_brute_force(stock):
     assert np.allclose(pr, ref, equal_nan=True)
 
 
+def test_percent_rank_ties_are_decided_by_value_not_rounding_noise():
+    """Regression (real 2330 data): equal values in the last bits must count as ties."""
+    x = 0.07014462463140887
+    s = pd.Series([x + 3e-17] * 4 + [x])               # previous values differ only by rounding noise
+    assert percent_rank(s, 4).iloc[4] == 100.0
+    assert percent_rank(pd.Series([1.0, 2.0, 3.0, 4.0, 2.5]), 4).iloc[4] == 50.0
+
+
 def test_recent_window_includes_current():
     c = pd.Series([False, False, True, False, False, False, False, False, False])
     r = bars_since_true_within(c, 6)
