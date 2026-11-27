@@ -1,0 +1,71 @@
+# Initial research settings from the user's system configuration (Prompt 03, sections 2-10).
+# These are NOT optimised parameters. Every value must be validated by backtest + OOS.
+
+[account]
+initial_capital = 1_000_000        # NT$
+risk_per_trade = 0.01              # 1% -> NT$10,000 initial risk budget
+max_weight_per_stock = 0.10
+max_weight_per_industry = 0.25
+max_gross_exposure = 0.90
+max_portfolio_open_risk = 0.05
+
+[trend]
+ma_fast = 13
+ma_mid = 34
+ma_slow = 55
+slope_lookback = 5                 # Slope55 = (MA55[t] - MA55[t-5]) / 5
+
+[bollinger]
+period = 20
+num_std = 2.0
+std_ddof = 0                       # population std, matches Pine ta.stdev(biased=true)
+bbw_pct_lookback = 120             # percentile over the previous 120 bars (current bar excluded)
+squeeze_pct = 20.0                 # BBW percentile <= 20
+squeeze_recent_bars = 6            # squeeze seen at least once in bars [t-5, t]
+
+[breakout]
+volume_ma = 20
+volume_mult = 1.5
+turnover_ma = 20
+min_turnover = 20_000_000          # NT$, raw close * raw volume (shares)
+
+[weekly]
+ma_fast = 13
+ma_mid = 34
+ma_slow = 55
+# Only the previous COMPLETED week is used on every daily bar of the current week.
+# Pine equivalent: request.security(sym, "W", expr[1], lookahead = barmerge.lookahead_on)
+
+[risk]
+atr_period = 14                    # Wilder ATR (RMA), matches Pine ta.atr
+stop_atr_mult = 2.5
+trail_atr_mult = 3.0
+trend_exit_ma = 34
+trend_exit_bars = 2                # 2 consecutive closes below MA34 -> exit next open
+time_stop_bars = 40
+time_stop_min_r = 1.0
+max_gap_atr = 1.0                  # cancel entry if open[t+1] > close[t] + 1.0 * ATR[t]  (research default)
+
+[costs]
+# Rates as of research date 2026-11; verify with broker / TWSE before deployment.
+commission_rate = 0.001425
+min_commission = 20                # NT$, typical broker minimum for board lots
+sell_tax_rate = 0.003              # ordinary shares, swing trading (NOT the day-trade rate)
+
+[costs.optimistic]
+commission_discount = 0.30
+slippage_bps = 3
+
+[costs.base]
+commission_discount = 0.60
+slippage_bps = 5
+
+[costs.stress]
+commission_discount = 1.00
+slippage_bps = 15
+
+[split]
+in_sample = 0.60
+validation = 0.20
+out_of_sample = 0.20
+embargo_bars = 40                  # >= time-stop horizon
