@@ -473,3 +473,70 @@ SCHEMA_V3: list[str] = [
     "('official','emerging_exit','inferred_from_prices','tpex_first_seen','first_price_date'))",
     "UPDATE security_master SET listing_basis = listing_date_basis WHERE listing_date_basis IS NOT NULL",
 ]
+
+
+# =====================================================================================
+# Schema v4 (Stage 3): strategy versions, technical indicators, strategy signals.
+# Condition and entry flags are stored as bitmasks to keep the full-market table small
+# (about 7 million rows per strategy version); the *_readable view expands them.
+# =====================================================================================
+CONDITION_BITS = {"daily_trend": 1, "squeeze": 2, "recent_squeeze": 4, "breakout": 8, "volume_confirm_incl": 16,
+                  "volume_confirm_prior": 32, "weekly_trend": 64, "liquid": 128, "eligible": 256,
+                  "volume_confirm": 512}
+ENTRY_BITS = {"A": 1, "B": 2, "C": 4, "D": 8, "E": 16, "S0": 32}
+
+SCHEMA_V4: list[str] = [
+    f"""
+    CREATE TABLE strategy_versions (
+        strategy_version_id TEXT NOT NULL PRIMARY KEY,      -- sha256 of params, first 16 hex
+        name                TEXT NOT NULL,
+        params              TEXT NOT NULL CHECK (json_valid(params)),
+        indicator_version   TEXT NOT NULL,
+        code_version        TEXT NOT NULL,
+        description         TEXT,
+        {_ts('created_at')}
+    ) STRICT
+    """,
+    f"""
+    CREATE TABLE technical_indicators (
+        stock_id          TEXT NOT NULL,
+        {_date('date')},
+        indicator_version TEXT NOT NULL,
+        close_raw REAL, close_adj REAL, volume_adj REAL,
+        ma13 REAL, ma34 REAL, ma55 REAL, slope55 REAL,
+        bb_mid REAL, bb_upper REAL, bb_lower REAL, bbw REAL, bbw_pct REAL,
+        atr14_raw REAL,
+        volume_ma20_incl REAL, volume_ma20_prior REAL, turnover_ma20 REAL,
+        w_ma13 REAL, w_ma34 REAL, w_ma55 REAL,
+        {_date('weekly_source_week_end', True)},
+        {_ts('computed_at')},
+        PRIMARY KEY (stock_id, date, indicator_version)
+    ) STRICT, WITHOUT ROWID
+    """,
+    f"""
+    CREATE TABLE strategy_signals (
+        stock_id            TEXT NOT NULL,
+        {_date('date')},                                   -- signal day t
+        strategy_version_id TEXT NOT NULL REFERENCES strategy_versions (strategy_version_id),
+        signal_as_of        TEXT NOT NULL,                 -- t at the 13:30 Taipei close: when the signal is known
+        {_date('earliest_entry_date', True)},              -- next trading day (NULL if not yet in the calendar)
+        conditions          INTEGER NOT NULL,              -- bitmask, see CONDITION_BITS
+        entries             INTEGER NOT NULL,              -- bitmask, see ENTRY_BITS
+        {_ts('computed_at')},
+        PRIMARY KEY (stock_id, date, strategy_version_id)
+    ) STRICT, WITHOUT ROWID
+    """,
+    "CREATE INDEX ix_strategy_signals_date ON strategy_signals (strategy_version_id, date, entries)",
+    "CREATE VIEW strategy_signals_readable AS SELECT stock_id, date, strategy_version_id, signal_as_of, "
+    "earliest_entry_date, "
+    + ", ".join(f"(conditions & {b}) > 0 AS {n}" for n, b in CONDITION_BITS.items()) + ", "
+    + ", ".join(f"(entries & {b}) > 0 AS entry_{n}" for n, b in ENTRY_BITS.items())
+    + " FROM strategy_signals",
+]
+
+TABLE_KEYS.update({
+    "strategy_versions": ("strategy_version_id",),
+    "technical_indicators": ("stock_id", "date", "indicator_version"),
+    "strategy_signals": ("stock_id", "date", "strategy_version_id"),
+})
+REQUIRED_TABLES = REQUIRED_TABLES + ("strategy_versions", "technical_indicators", "strategy_signals")

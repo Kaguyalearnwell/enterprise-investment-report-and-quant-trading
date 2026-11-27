@@ -43,6 +43,10 @@ VERSIONS: dict[str, tuple[str, ...]] = {
 }
 
 
+VOLUME_MODES = {"include_today": ("volume_ma_incl", "volume_confirm_incl"),
+                "prior_20": ("volume_ma_prior", "volume_confirm_prior")}
+
+
 def compute_features(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     t, bb, br, rk, wk = cfg["trend"], cfg["bollinger"], cfg["breakout"], cfg["risk"], cfg["weekly"]
     c = df["adj_close"]
@@ -70,8 +74,16 @@ def compute_features(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
 
     # --- breakout & volume -----------------------------------------------------
     f["breakout"] = c > f["bb_upper"]
-    f["volume_ma"] = sma(df["adj_volume"], br["volume_ma"])          # includes bar t, like Pine ta.sma(volume, 20)
-    f["volume_confirm"] = df["adj_volume"] > br["volume_mult"] * f["volume_ma"]
+    vma = sma(df["adj_volume"], br["volume_ma"])
+    f["volume_ma_incl"] = vma                       # includes bar t, like Pine ta.sma(volume, 20)
+    f["volume_ma_prior"] = vma.shift(1)             # the 20 complete bars before t
+    f["volume_confirm_incl"] = df["adj_volume"] > br["volume_mult"] * f["volume_ma_incl"]
+    f["volume_confirm_prior"] = df["adj_volume"] > br["volume_mult"] * f["volume_ma_prior"]
+    mode = br.get("volume_ma_mode", "include_today")
+    if mode not in VOLUME_MODES:
+        raise ValueError(f"volume_ma_mode must be one of {sorted(VOLUME_MODES)}, got {mode!r}")
+    f["volume_ma"] = f[VOLUME_MODES[mode][0]]
+    f["volume_confirm"] = f[VOLUME_MODES[mode][1]]
 
     # --- liquidity (raw prices, NT$) ------------------------------------------
     f["turnover_ma"] = sma(df["close"] * df["volume"], br["turnover_ma"])
@@ -82,6 +94,8 @@ def compute_features(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     f["weekly_trend"] = w["weekly_trend"]
     f["weekly_valid"] = w["weekly_valid"]
     f["weekly_source_week_end"] = w["source_week_end"]
+    for col in ("w_ma_fast", "w_ma_mid", "w_ma_slow"):
+        f[col] = w[col]
 
     # --- risk inputs -----------------------------------------------------------
     atr_adj = wilder_atr(df["adj_high"], df["adj_low"], c, rk["atr_period"])

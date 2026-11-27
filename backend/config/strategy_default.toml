@@ -26,6 +26,10 @@ squeeze_recent_bars = 6            # squeeze seen at least once in bars [t-5, t]
 [breakout]
 volume_ma = 20
 volume_mult = 1.5
+# Prompt 04 §8.2: both definitions are tested.
+#   include_today: Volume[t] > 1.5 * SMA(Volume, 20)[t]       (bar t inside the average; Pine ta.sma)
+#   prior_20:      Volume[t] > 1.5 * SMA(Volume, 20)[t-1]     (previous 20 complete bars only)
+volume_ma_mode = "include_today"
 turnover_ma = 20
 min_turnover = 20_000_000          # NT$, raw close * raw volume (shares)
 

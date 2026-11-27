@@ -28,6 +28,8 @@ from backend.data.collectors.downloader import DATASETS, Downloader, default_as_
 from backend.data.pipeline import DataPipeline, seed_source_registry
 from backend.data.providers.official_provider import TPExProvider
 from backend.data.validators.survivorship_audit import SurvivorshipAudit, write_survivorship_report
+from backend.config.strategy_config import load_config
+from backend.strategies.runner import SignalRunner, daily_screen, explain
 from backend.data.providers.finmind_provider import FinMindProvider
 from backend.database.db_manager import DatabaseManager
 from backend.core.logger import setup_logging
@@ -62,6 +64,21 @@ def _parser() -> argparse.ArgumentParser:
     a = sub.add_parser("audit-survivorship", help="compare the universe with official TPEx monthly snapshots")
     a.add_argument("--start", default=DEFAULT_START)
     a.add_argument("--end", default=None)
+    sg = sub.add_parser("signals", help="strategy indicators and signals")
+    ssub = sg.add_subparsers(dest="signals_cmd", required=True)
+    sc = ssub.add_parser("compute", help="compute indicators + signals (both volume definitions)")
+    gsc = sc.add_mutually_exclusive_group(required=True)
+    gsc.add_argument("--stocks", nargs="+")
+    gsc.add_argument("--all", action="store_true")
+    sl = ssub.add_parser("list", help="research signals on a date (NOT simulated fills)")
+    sl.add_argument("--date", default=None, help="default: latest signal date")
+    sl.add_argument("--version", default="E", choices=["A", "B", "C", "D", "E", "S0"])
+    sl.add_argument("--volume-mode", default="include_today", choices=["include_today", "prior_20"])
+    sl.add_argument("--csv", default=None, help="also write the list to this CSV file")
+    se = ssub.add_parser("explain", help="why a stock did / did not signal on a date")
+    se.add_argument("stock")
+    se.add_argument("date")
+    se.add_argument("--volume-mode", default="include_today", choices=["include_today", "prior_20"])
     sub.add_parser("registry", help="seed / refresh data_source_registry")
     v = sub.add_parser("version", help="record a data version fingerprint")
     v.add_argument("description")
@@ -99,6 +116,31 @@ def main(argv: list[str] | None = None) -> int:
         md = write_survivorship_report(res, s.reports_dir / "survivorship")
         log.info("survivorship audit: added %d, exchange resolved %d -> %s", res["added_to_master"],
                  res["exchange_resolved_to_tpex"], md)
+        return 0
+    if args.cmd == "signals":
+        runner = SignalRunner(db, load_config(), as_of)
+        if args.signals_cmd == "compute":
+            ids = args.stocks or db.read_sql("SELECT DISTINCT stock_id FROM daily_prices_adj ORDER BY 1").stock_id.tolist()
+            st = runner.run(ids)
+            log.info("signals: %d stocks, %d indicator rows, %d signal rows; versions %s; entries %s",
+                     st["stocks"], st["indicator_rows"], st["signal_rows"], st["versions"], st["entries"])
+            return 0
+        vid = runner.register_version(args.volume_mode)
+        if args.signals_cmd == "explain":
+            import json as _json
+            print(_json.dumps(explain(db, args.stock, args.date, vid), ensure_ascii=False, indent=2, default=str))
+            return 0
+        date = args.date or db.read_sql("SELECT MAX(date) d FROM strategy_signals WHERE strategy_version_id=?",
+                                        (vid,)).d[0]
+        df = daily_screen(db, date, vid, args.version)
+        print(f"research signals {args.version} on {date} (volume {args.volume_mode}, version {vid}): {len(df)} stocks")
+        print("注意：這是研究訊號，不是成交；模擬進場最早為下一交易日開盤。")
+        if not df.empty:
+            print(df[["stock_id", "stock_name", "industry_category", "close_raw", "turnover_ma20", "bbw_pct",
+                      "volume_ratio_incl", "atr14_raw", "reference_initial_stop", "earliest_entry_date"]]
+                  .to_string(index=False))
+            if args.csv:
+                df.to_csv(args.csv, index=False, encoding="utf-8-sig")
         return 0
     if args.cmd == "registry":
         log.info("data_source_registry rows written: %d", seed_source_registry(db))
