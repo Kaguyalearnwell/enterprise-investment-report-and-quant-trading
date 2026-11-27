@@ -1,0 +1,493 @@
+{
+ "run_at_utc": "2026-11-27T17:40:09.469529+00:00",
+ "checks": {
+  "TaiwanStockFinancialStatements 2330": {
+   "http": 200,
+   "msg": "success",
+   "rows": 136,
+   "fields": [
+    "date",
+    "stock_id",
+    "type",
+    "value",
+    "origin_name"
+   ],
+   "date_min": "2023-03-31",
+   "date_max": "2024-12-31",
+   "n_types": 17,
+   "types_sample": [
+    "ComprehensiveIncomeConsolidatedNetIncomeAttributedNonControllingInterest",
+    "CostOfGoodsSold",
+    "EPS",
+    "EquityAttributableToOwnersOfParent",
+    "GrossProfit",
+    "IncomeAfterTaxes",
+    "IncomeFromContinuingOperations",
+    "NoncontrollingInterests",
+    "OTHNOE",
+    "OperatingExpenses",
+    "OperatingIncome",
+    "OtherComprehensiveIncome",
+    "PreTaxIncome",
+    "Revenue",
+    "TAX",
+    "TotalConsolidatedProfitForThePeriod",
+    "TotalNonoperatingIncomeAndExpense"
+   ],
+   "has_announcement_field": false
+  },
+  "TaiwanStockBalanceSheet 2330": {
+   "http": 200,
+   "msg": "success",
+   "rows": 828,
+   "fields": [
+    "date",
+    "stock_id",
+    "type",
+    "value",
+    "origin_name"
+   ],
+   "date_min": "2023-03-31",
+   "date_max": "2024-12-31",
+   "n_types": 105,
+   "types_sample": [
+    "AccountsPayable",
+    "AccountsPayableToRelatedParties",
+    "AccountsPayableToRelatedParties_per",
+    "AccountsPayable_per",
+    "AccountsReceivableDuefromRelatedPartiesNet",
+    "AccountsReceivableDuefromRelatedPartiesNet_per",
+    "AccountsReceivableNet",
+    "AccountsReceivableNet_per",
+    "BondsPayable",
+    "BondsPayable_per",
+    "CapitalStock",
+    "CapitalStock_per",
+    "CapitalSurplus",
+    "CapitalSurplusAdditionalPaidInCapital",
+    "CapitalSurplusAdditionalPaidInCapital_per",
+    "CapitalSurplusChangesInEquityOfAssociatesAndJointVenturesAccountedForUsingEquityMethod",
+    "CapitalSurplusChangesInEquityOfAssociatesAndJointVenturesAccountedForUsingEquityMethod_per",
+    "CapitalSurplusDonatedAssetsReceived",
+    "CapitalSurplusDonatedAssetsReceived_per",
+    "CapitalSurplusNetAssetsFromMerger",
+    "CapitalSurplusNetAssetsFromMerger_per",
+    "CapitalSurplus_per",
+    "CashAndCashEquivalents",
+    "CashAndCashEquivalents_per",
+    "CurrentAssets"
+   ],
+   "has_announcement_field": false
+  },
+  "TaiwanStockCashFlowsStatement 2330": {
+   "http": 200,
+   "msg": "success",
+   "rows": 232,
+   "fields": [
+    "date",
+    "stock_id",
+    "type",
+    "value",
+    "origin_name"
+   ],
+   "date_min": "2023-03-31",
+   "date_max": "2024-12-31",
+   "n_types": 31,
+   "types_sample": [
+    "AccountsPayable",
+    "AmortizationExpense",
+    "AmountDueToRelatedParties",
+    "CashBalancesBeginningOfPeriod",
+    "CashBalancesEndOfPeriod",
+    "CashBalancesIncrease",
+    "CashFlowsFromOperatingActivities",
+    "CashFlowsProvidedFromFinancingActivities",
+    "CashProvidedByInvestingActivities",
+    "CashReceivedThroughOperations",
+    "DecreaseInDepositDeposit",
+    "DecreaseInShortTermLoans",
+    "Depreciation",
+    "EffectOfExchangeRateChangesOnCashAndCashEquivalents",
+    "HedgingFinancialLiabilities",
+    "IncomeBeforeIncomeTaxFromContinuingOperations",
+    "InterestExpense",
+    "InterestIncome",
+    "InventoryIncrease",
+    "NetCashInflowFromOperatingActivities",
+    "NetIncomeBeforeTax",
+    "OtherInvestingActivities",
+    "OtherNonCurrentLiabilitiesIncrease",
+    "PayTheInterest",
+    "ProceedsFromLongTermDebt"
+   ],
+   "has_announcement_field": false
+  },
+  "TaiwanStockFinancialStatements 2881 (financial)": {
+   "http": 200,
+   "msg": "success",
+   "rows": 32,
+   "fields": [
+    "date",
+    "stock_id",
+    "type",
+    "value",
+    "origin_name"
+   ],
+   "date_min": "2024-03-31",
+   "date_max": "2024-06-30",
+   "n_types": 16,
+   "types_sample": [
+    "BadDebts",
+    "ComprehensiveIncomeConsolidatedNetIncomeAttributedNonControllingInterest",
+    "EPS",
+    "EquityAttributableToOwnersOfParent",
+    "IncomeAfterTax",
+    "IncomeFromContinuingOperations",
+    "NetChangeInProvisionsForInsuranceLiabilities",
+    "NetInterestIncome",
+    "NetNonInterestIncome",
+    "NoncontrollingInterests",
+    "OperatingExpenses",
+    "OtherComprehensiveIncomeAfterTaxThePeriod",
+    "PreTaxIncome",
+    "Revenue",
+    "TAX",
+    "TotalConsolidatedProfitForThePeriod"
+   ],
+   "has_announcement_field": false
+  },
+  "TaiwanStockFinancialStatements 3068 (delisted 2018)": {
+   "http": 200,
+   "msg": "success",
+   "rows": 317,
+   "fields": [
+    "date",
+    "stock_id",
+    "type",
+    "value",
+    "origin_name"
+   ],
+   "date_min": "2013-03-31",
+   "date_max": "2018-03-31",
+   "n_types": 17,
+   "types_sample": [
+    "ComprehensiveIncomeAttributableToOwnersOfParent",
+    "ComprehensiveIncomeConsolidatedNetIncomeAttributedNonControllingInterest",
+    "CostOfGoodsSold",
+    "EPS",
+    "EquityAttributableToOwnersOfParent",
+    "GrossProfit",
+    "IncomeAfterTaxes",
+    "IncomeFromContinuingOperations",
+    "OTHNOE",
+    "OperatingExpenses",
+    "OperatingIncome",
+    "OtherComprehensiveIncome",
+    "PreTaxIncome",
+    "Revenue",
+    "TAX",
+    "TotalConsolidatedProfitForThePeriod",
+    "TotalNonoperatingIncomeAndExpense"
+   ],
+   "has_announcement_field": false
+  },
+  "TaiwanStockMonthRevenue 3068 (delisted 2018)": {
+   "http": 200,
+   "msg": "success",
+   "rows": 1,
+   "fields": [
+    "date",
+    "stock_id",
+    "country",
+    "revenue",
+    "revenue_month",
+    "revenue_year",
+    "create_time"
+   ],
+   "date_min": "2013-01-01",
+   "date_max": "2013-01-01",
+   "has_announcement_field": true
+  },
+  "TaiwanStockDividend 2330": {
+   "http": 200,
+   "msg": "success",
+   "rows": 28,
+   "fields": [
+    "date",
+    "stock_id",
+    "year",
+    "StockEarningsDistribution",
+    "StockStatutorySurplus",
+    "StockExDividendTradingDate",
+    "TotalEmployeeStockDividend",
+    "TotalEmployeeStockDividendAmount",
+    "RatioOfEmployeeStockDividendOfTotal",
+    "RatioOfEmployeeStockDividend",
+    "CashEarningsDistribution",
+    "CashStatutorySurplus",
+    "CashExDividendTradingDate",
+    "CashDividendPaymentDate",
+    "TotalEmployeeCashDividend",
+    "TotalNumberOfCashCapitalIncrease",
+    "CashIncreaseSubscriptionRate",
+    "CashIncreaseSubscriptionpRrice",
+    "RemunerationOfDirectorsAndSupervisors",
+    "ParticipateDistributionOfTotalShares",
+    "AnnouncementDate",
+    "AnnouncementTime"
+   ],
+   "date_min": "2020-03-25",
+   "date_max": "2026-12-16",
+   "has_announcement_field": true
+  },
+  "TaiwanStockPER 2330": {
+   "http": 200,
+   "msg": "success",
+   "rows": 7,
+   "fields": [
+    "date",
+    "stock_id",
+    "dividend_yield",
+    "PER",
+    "PBR"
+   ],
+   "date_min": "2024-01-02",
+   "date_max": "2024-01-10",
+   "has_announcement_field": false
+  },
+  "TaiwanStockFinancialStatements all stocks one date": {
+   "http": 400,
+   "msg": "Your level is register. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor",
+   "rows": 0,
+   "fields": []
+  },
+  "month_revenue_observed_availability": {
+   "observations": 36,
+   "after_10th": 14,
+   "after_15th": 5,
+   "max_day_of_month": 20,
+   "rows": [
+    {
+     "stock_id": "2330",
+     "revenue_month": "2026-04",
+     "create_time": "2026-05-08",
+     "day_of_month": 8
+    },
+    {
+     "stock_id": "2330",
+     "revenue_month": "2026-05",
+     "create_time": "2026-06-10",
+     "day_of_month": 10
+    },
+    {
+     "stock_id": "2330",
+     "revenue_month": "2026-06",
+     "create_time": "2026-07-13",
+     "day_of_month": 13
+    },
+    {
+     "stock_id": "2330",
+     "revenue_month": "2026-07",
+     "create_time": "2026-08-10",
+     "day_of_month": 10
+    },
+    {
+     "stock_id": "2330",
+     "revenue_month": "2026-08",
+     "create_time": "2026-09-10",
+     "day_of_month": 10
+    },
+    {
+     "stock_id": "2330",
+     "revenue_month": "2026-09",
+     "create_time": "2026-10-08",
+     "day_of_month": 8
+    },
+    {
+     "stock_id": "2330",
+     "revenue_month": "2026-10",
+     "create_time": "2026-11-10",
+     "day_of_month": 10
+    },
+    {
+     "stock_id": "2317",
+     "revenue_month": "2026-04",
+     "create_time": "2026-05-06",
+     "day_of_month": 6
+    },
+    {
+     "stock_id": "2317",
+     "revenue_month": "2026-05",
+     "create_time": "2026-06-06",
+     "day_of_month": 6
+    },
+    {
+     "stock_id": "2317",
+     "revenue_month": "2026-06",
+     "create_time": "2026-07-06",
+     "day_of_month": 6
+    },
+    {
+     "stock_id": "2317",
+     "revenue_month": "2026-07",
+     "create_time": "2026-08-07",
+     "day_of_month": 7
+    },
+    {
+     "stock_id": "2317",
+     "revenue_month": "2026-08",
+     "create_time": "2026-09-06",
+     "day_of_month": 6
+    },
+    {
+     "stock_id": "2317",
+     "revenue_month": "2026-09",
+     "create_time": "2026-10-06",
+     "day_of_month": 6
+    },
+    {
+     "stock_id": "2317",
+     "revenue_month": "2026-10",
+     "create_time": "2026-11-06",
+     "day_of_month": 6
+    },
+    {
+     "stock_id": "5347",
+     "revenue_month": "2026-03",
+     "create_time": "2026-04-20",
+     "day_of_month": 20
+    },
+    {
+     "stock_id": "5347",
+     "revenue_month": "2026-04",
+     "create_time": "2026-05-08",
+     "day_of_month": 8
+    },
+    {
+     "stock_id": "5347",
+     "revenue_month": "2026-05",
+     "create_time": "2026-06-09",
+     "day_of_month": 9
+    },
+    {
+     "stock_id": "5347",
+     "revenue_month": "2026-06",
+     "create_time": "2026-07-09",
+     "day_of_month": 9
+    },
+    {
+     "stock_id": "5347",
+     "revenue_month": "2026-07",
+     "create_time": "2026-08-07",
+     "day_of_month": 7
+    },
+    {
+     "stock_id": "5347",
+     "revenue_month": "2026-08",
+     "create_time": "2026-09-09",
+     "day_of_month": 9
+    },
+    {
+     "stock_id": "5347",
+     "revenue_month": "2026-09",
+     "create_time": "2026-10-08",
+     "day_of_month": 8
+    },
+    {
+     "stock_id": "5347",
+     "revenue_month": "2026-10",
+     "create_time": "2026-11-09",
+     "day_of_month": 9
+    },
+    {
+     "stock_id": "1101",
+     "revenue_month": "2026-04",
+     "create_time": "2026-05-12",
+     "day_of_month": 12
+    },
+    {
+     "stock_id": "1101",
+     "revenue_month": "2026-05",
+     "create_time": "2026-06-11",
+     "day_of_month": 11
+    },
+    {
+     "stock_id": "1101",
+     "revenue_month": "2026-06",
+     "create_time": "2026-07-11",
+     "day_of_month": 11
+    },
+    {
+     "stock_id": "1101",
+     "revenue_month": "2026-07",
+     "create_time": "2026-08-11",
+     "day_of_month": 11
+    },
+    {
+     "stock_id": "1101",
+     "revenue_month": "2026-08",
+     "create_time": "2026-09-10",
+     "day_of_month": 10
+    },
+    {
+     "stock_id": "1101",
+     "revenue_month": "2026-09",
+     "create_time": "2026-10-13",
+     "day_of_month": 13
+    },
+    {
+     "stock_id": "1101",
+     "revenue_month": "2026-10",
+     "create_time": "2026-11-10",
+     "day_of_month": 10
+    },
+    {
+     "stock_id": "2881",
+     "revenue_month": "2026-04",
+     "create_time": "2026-05-15",
+     "day_of_month": 15
+    },
+    {
+     "stock_id": "2881",
+     "revenue_month": "2026-05",
+     "create_time": "2026-06-13",
+     "day_of_month": 13
+    },
+    {
+     "stock_id": "2881",
+     "revenue_month": "2026-06",
+     "create_time": "2026-07-16",
+     "day_of_month": 16
+    },
+    {
+     "stock_id": "2881",
+     "revenue_month": "2026-07",
+     "create_time": "2026-08-14",
+     "day_of_month": 14
+    },
+    {
+     "stock_id": "2881",
+     "revenue_month": "2026-08",
+     "create_time": "2026-09-16",
+     "day_of_month": 16
+    },
+    {
+     "stock_id": "2881",
+     "revenue_month": "2026-09",
+     "create_time": "2026-10-16",
+     "day_of_month": 16
+    },
+    {
+     "stock_id": "2881",
+     "revenue_month": "2026-10",
+     "create_time": "2026-11-17",
+     "day_of_month": 17
+    }
+   ]
+  },
+  "reachability https://mops.twse.com.tw/mops/web/index": {
+   "http": 200,
+   "blocked_by_waf": true
+  }
+ }
+}
