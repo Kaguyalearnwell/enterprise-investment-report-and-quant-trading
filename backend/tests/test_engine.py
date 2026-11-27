@@ -194,3 +194,16 @@ def test_par_value_change_keeps_risk_and_r_in_entry_units(cfg):
     assert t["shares"] == 1000 and t["entry_price"] == 100.0           # reported in entry units
     assert max(r["open_risk"] / r["equity"] for r in res.daily) < 0.006  # ~0.5%, not 5x more
     assert t["r_multiple"] == pytest.approx(t["pnl"] / 5000.0)         # 1,000 shares x (100 - 95)
+
+
+def test_ranking_does_not_depend_on_input_order(cfg):
+    """Regression: identical signals delivered in a different order must give identical results."""
+    bars = {sid: flat() for sid in ("1111", "2222", "3333", "4444")}
+    meta = {sid: {"industry": sid, "name": sid} for sid in bars}
+    sigs = [{"stock_id": sid, "signal_date": DAYS[1], "close": 100.0, "atr": 2.0, "turnover": 1e9} for sid in bars]
+    cash_cfg = copy.deepcopy(cfg)
+    cash_cfg["account"]["max_gross_exposure"] = 0.20          # room for exactly two 10% positions
+    a = engine(cash_cfg).run(DAYS[:5], bars, {DAYS[1]: sigs}, {}, meta)
+    b = engine(cash_cfg).run(DAYS[:5], bars, {DAYS[1]: list(reversed(sigs))}, {}, meta)
+    assert [t["stock_id"] for t in a.trades] == [t["stock_id"] for t in b.trades]
+    assert len(a.trades) == 2

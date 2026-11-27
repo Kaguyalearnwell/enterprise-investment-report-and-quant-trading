@@ -301,6 +301,9 @@ class PortfolioEngine:
         return res
 
     def _ranked(self, pending: list[dict], d: str) -> list[dict]:
+        # Canonical order first, so the result never depends on the order the signals were loaded in
+        # (regression: the database and the experiment context delivered the same signals in different orders).
+        pending = sorted(pending, key=lambda s: s["stock_id"])
         if self.rank == "turnover":
             return sorted(pending, key=lambda s: -s.get("turnover", 0.0))
         rng = np.random.default_rng(self.seed + zlib.crc32(d.encode()))

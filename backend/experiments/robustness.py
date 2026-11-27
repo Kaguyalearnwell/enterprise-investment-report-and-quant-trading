@@ -82,8 +82,11 @@ def _signals_for_combo(combo: dict) -> dict:
     return out
 
 
-def grid_signals(inputs: dict[str, pd.DataFrame], cfg: dict, window: tuple[str, str], workers: int = 4) -> dict:
+def grid_signals(inputs: dict[str, pd.DataFrame], cfg: dict, window: tuple[str, str], workers: int = 4,
+                 limit: int | None = None) -> dict:
     cs = combos()
+    if limit:                                   # pipeline test only: the baseline plus the first combinations
+        cs = [BASELINE] + [c for c in cs if key(c) != key(BASELINE)][: limit - 1]
     with ProcessPoolExecutor(max_workers=workers, initializer=_init, initargs=(inputs, cfg, window)) as ex:
         sigs = list(ex.map(_signals_for_combo, cs, chunksize=4))
     return {key(c): (c, s) for c, s in zip(cs, sigs)}

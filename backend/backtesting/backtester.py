@@ -26,7 +26,7 @@ from backend.database.db_manager import DatabaseManager, utc_now
 from backend.database.schema import ENTRY_BITS
 
 log = logging.getLogger(__name__)
-CODE_VERSION = "backtest/2"   # /2: share-count events rescale entry prices for open risk; R on entry values
+CODE_VERSION = "backtest/3"   # /3: same-day signal ranking independent of input order (reproducibility)
 
 
 def cost_model(cfg: dict, scenario: str, slippage_end: str) -> CostModel:
