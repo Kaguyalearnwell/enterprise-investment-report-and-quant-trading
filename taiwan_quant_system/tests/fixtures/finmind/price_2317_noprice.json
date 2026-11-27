@@ -1,0 +1,66 @@
+{
+"msg": "success",
+"status": 200,
+"data": [
+{
+"date": "2025-07-28",
+"stock_id": "2317",
+"Trading_Volume": 55666706,
+"Trading_money": 9839859868,
+"open": 176.0,
+"max": 178.0,
+"min": 175.5,
+"close": 176.0,
+"spread": 1.5,
+"Trading_turnover": 42177
+},
+{
+"date": "2025-07-29",
+"stock_id": "2317",
+"Trading_Volume": 49613588,
+"Trading_money": 8549605375,
+"open": 175.0,
+"max": 175.5,
+"min": 171.0,
+"close": 171.5,
+"spread": -4.5,
+"Trading_turnover": 69848
+},
+{
+"date": "2025-07-30",
+"stock_id": "2317",
+"Trading_Volume": 0,
+"Trading_money": 0,
+"open": 0.0,
+"max": 0.0,
+"min": 0.0,
+"close": 0.0,
+"spread": 0.0,
+"Trading_turnover": 0
+},
+{
+"date": "2025-07-31",
+"stock_id": "2317",
+"Trading_Volume": 90529600,
+"Trading_money": 16087437011,
+"open": 178.0,
+"max": 179.0,
+"min": 176.0,
+"close": 178.0,
+"spread": 0.0,
+"Trading_turnover": 65592
+},
+{
+"date": "2025-08-01",
+"stock_id": "2317",
+"Trading_Volume": 65361707,
+"Trading_money": 11706827616,
+"open": 175.0,
+"max": 181.5,
+"min": 175.0,
+"close": 181.5,
+"spread": 3.5,
+"Trading_turnover": 51454
+}
+]
+}

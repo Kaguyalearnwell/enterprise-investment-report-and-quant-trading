@@ -1,0 +1,118 @@
+{
+"msg": "success",
+"status": 200,
+"data": [
+{
+"industry_category": "電器電纜",
+"stock_id": "1230",
+"stock_name": "聯成食",
+"type": "twse",
+"date": "2024-12-03"
+},
+{
+"industry_category": "存託憑證",
+"stock_id": "911602",
+"stock_name": "華豐泰",
+"type": "twse",
+"date": "2024-12-04"
+},
+{
+"industry_category": "上櫃指數股票型基金(ETF)",
+"stock_id": "006201",
+"stock_name": "元大富櫃50",
+"type": "tpex",
+"date": "2024-12-30"
+},
+{
+"industry_category": "上櫃指數股票型基金(ETF)",
+"stock_id": "00679B",
+"stock_name": "元大美債20年",
+"type": "tpex",
+"date": "2024-12-30"
+},
+{
+"industry_category": "其他",
+"stock_id": "2358",
+"stock_name": "廷鑫",
+"type": "twse",
+"date": "2026-07-08"
+},
+{
+"industry_category": "半導體業",
+"stock_id": "6515",
+"stock_name": "穎崴",
+"type": "twse",
+"date": "2026-11-27"
+},
+{
+"industry_category": "電子工業",
+"stock_id": "6515",
+"stock_name": "穎崴",
+"type": "twse",
+"date": "2026-11-27"
+},
+{
+"industry_category": "其他電子業",
+"stock_id": "2317",
+"stock_name": "鴻海",
+"type": "twse",
+"date": "2026-11-27"
+},
+{
+"industry_category": "電子工業",
+"stock_id": "2317",
+"stock_name": "鴻海",
+"type": "twse",
+"date": "2026-11-27"
+},
+{
+"industry_category": "半導體業",
+"stock_id": "2330",
+"stock_name": "台積電",
+"type": "twse",
+"date": "2026-11-27"
+},
+{
+"industry_category": "電子工業",
+"stock_id": "2330",
+"stock_name": "台積電",
+"type": "twse",
+"date": "2026-11-27"
+},
+{
+"industry_category": "上櫃ETF",
+"stock_id": "006201",
+"stock_name": "元大富櫃50",
+"type": "tpex",
+"date": "2026-11-27"
+},
+{
+"industry_category": "ETF",
+"stock_id": "0050",
+"stock_name": "元大台灣50",
+"type": "twse",
+"date": "2026-11-27"
+},
+{
+"industry_category": "上櫃ETF",
+"stock_id": "00679B",
+"stock_name": "元大美債20年",
+"type": "tpex",
+"date": "2026-11-27"
+},
+{
+"industry_category": "金融保險",
+"stock_id": "2881",
+"stock_name": "富邦金",
+"type": "twse",
+"date": "2026-11-27"
+},
+{
+"industry_category": "金融保險",
+"stock_id": "2881A",
+"stock_name": "富邦特",
+"type": "twse",
+"date": "2026-11-27"
+}
+]
+}

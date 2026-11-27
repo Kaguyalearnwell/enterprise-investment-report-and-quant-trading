@@ -1,0 +1,54 @@
+{
+"msg": "success",
+"status": 200,
+"data": [
+{
+"date": "2025-07-29",
+"stock_id": "9929",
+"Trading_Volume": 7000,
+"Trading_money": 97100,
+"open": 13.9,
+"max": 14.15,
+"min": 13.8,
+"close": 13.8,
+"spread": -0.45,
+"Trading_turnover": 6
+},
+{
+"date": "2025-07-30",
+"stock_id": "9929",
+"Trading_Volume": 0,
+"Trading_money": 0,
+"open": 0.0,
+"max": 0.0,
+"min": 0.0,
+"close": 0.0,
+"spread": 0.0,
+"Trading_turnover": 0
+},
+{
+"date": "2025-07-31",
+"stock_id": "9929",
+"Trading_Volume": 451,
+"Trading_money": 6223,
+"open": 0.0,
+"max": 0.0,
+"min": 0.0,
+"close": 0.0,
+"spread": 0.0,
+"Trading_turnover": 1
+},
+{
+"date": "2025-08-01",
+"stock_id": "9929",
+"Trading_Volume": 4007,
+"Trading_money": 55349,
+"open": 13.9,
+"max": 13.9,
+"min": 13.75,
+"close": 13.8,
+"spread": 0.0,
+"Trading_turnover": 5
+}
+]
+}

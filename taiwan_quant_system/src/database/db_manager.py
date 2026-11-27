@@ -258,10 +258,12 @@ class DatabaseManager:
 
         Uses only dates; a security whose listing date is unknown falls back to its
         first price date. Never uses today's membership to decide a past date.
+        Exchange 'UNKNOWN' (delisted stocks found only in the delisting table) is
+        included on purpose: dropping them would re-introduce survivorship bias.
         """
         return self.read_sql(
             """SELECT * FROM security_master
-               WHERE security_type = ? AND exchange IN ('TWSE','TPEX')
+               WHERE security_type = ? AND exchange IN ('TWSE','TPEX','UNKNOWN')
                  AND COALESCE(listing_date, first_price_date) <= ?
                  AND (delisting_date IS NULL OR delisting_date > ?)
                ORDER BY stock_id""",

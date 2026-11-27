@@ -1,0 +1,102 @@
+{
+"msg": "success",
+"status": 200,
+"data": [
+{
+"date": "2018-05-28",
+"stock_id": "3068",
+"Trading_Volume": 8466655,
+"Trading_money": 963867644,
+"open": 113.5,
+"max": 115.5,
+"min": 110.5,
+"close": 115.5,
+"spread": 10.5,
+"Trading_turnover": 4334
+},
+{
+"date": "2018-05-29",
+"stock_id": "3068",
+"Trading_Volume": 10250382,
+"Trading_money": 1176541166,
+"open": 114.0,
+"max": 119.0,
+"min": 107.5,
+"close": 113.0,
+"spread": -2.5,
+"Trading_turnover": 6612
+},
+{
+"date": "2018-05-30",
+"stock_id": "3068",
+"Trading_Volume": 2237140,
+"Trading_money": 244156760,
+"open": 109.0,
+"max": 112.0,
+"min": 107.0,
+"close": 109.0,
+"spread": -4.0,
+"Trading_turnover": 1251
+},
+{
+"date": "2018-05-31",
+"stock_id": "3068",
+"Trading_Volume": 2055887,
+"Trading_money": 227998296,
+"open": 113.5,
+"max": 114.5,
+"min": 107.0,
+"close": 108.0,
+"spread": -1.0,
+"Trading_turnover": 1181
+},
+{
+"date": "2018-06-01",
+"stock_id": "3068",
+"Trading_Volume": 1407451,
+"Trading_money": 155150828,
+"open": 110.0,
+"max": 112.0,
+"min": 108.5,
+"close": 111.0,
+"spread": 3.0,
+"Trading_turnover": 796
+},
+{
+"date": "2018-06-04",
+"stock_id": "3068",
+"Trading_Volume": 2797919,
+"Trading_money": 324922523,
+"open": 116.0,
+"max": 120.0,
+"min": 112.5,
+"close": 117.0,
+"spread": 6.0,
+"Trading_turnover": 1542
+},
+{
+"date": "2018-06-05",
+"stock_id": "3068",
+"Trading_Volume": 2291375,
+"Trading_money": 273252300,
+"open": 120.0,
+"max": 123.5,
+"min": 115.5,
+"close": 115.5,
+"spread": -1.5,
+"Trading_turnover": 1253
+},
+{
+"date": "2018-06-06",
+"stock_id": "3068",
+"Trading_Volume": 3971632,
+"Trading_money": 485957972,
+"open": 117.0,
+"max": 125.5,
+"min": 117.0,
+"close": 121.0,
+"spread": 5.5,
+"Trading_turnover": 1582
+}
+]
+}
