@@ -651,3 +651,40 @@ SCHEMA_V5: list[str] = [
 ]
 REQUIRED_TABLES = REQUIRED_TABLES + ("data_quality_verdicts", "backtest_runs", "simulated_trades", "portfolio_daily",
                                      "portfolio_positions", "portfolio_cash", "performance_metrics")
+
+
+# =====================================================================================
+# Schema v6 (Stage 5): experiment registry. Every trial is logged, good or bad.
+# =====================================================================================
+SCHEMA_V6: list[str] = [
+    f"""
+    CREATE TABLE experiment_registry (
+        experiment_id       TEXT NOT NULL PRIMARY KEY,
+        name                TEXT NOT NULL,
+        kind                TEXT NOT NULL,
+        hypothesis          TEXT,
+        design              TEXT NOT NULL CHECK (json_valid(design)),
+        segment             TEXT NOT NULL,
+        strategy_version_id TEXT,
+        data_version_id     INTEGER,
+        preregistration     TEXT,
+        {_ts('created_at')},
+        status              TEXT NOT NULL CHECK (status IN ('running','completed','failed')),
+        result_summary      TEXT CHECK (result_summary IS NULL OR json_valid(result_summary))
+    ) STRICT
+    """,
+    f"""
+    CREATE TABLE experiment_trials (
+        experiment_id TEXT NOT NULL REFERENCES experiment_registry (experiment_id),
+        trial_no      INTEGER NOT NULL,
+        label         TEXT NOT NULL,
+        params        TEXT NOT NULL CHECK (json_valid(params)),
+        segment       TEXT NOT NULL,
+        metrics       TEXT NOT NULL CHECK (json_valid(metrics)),
+        run_id        TEXT,
+        {_ts('created_at')},
+        PRIMARY KEY (experiment_id, trial_no)
+    ) STRICT
+    """,
+]
+REQUIRED_TABLES = REQUIRED_TABLES + ("experiment_registry", "experiment_trials")

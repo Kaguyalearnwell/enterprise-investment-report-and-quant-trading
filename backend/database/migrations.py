@@ -14,7 +14,7 @@ import logging
 import sqlite3
 from dataclasses import dataclass
 
-from backend.database.schema import SCHEMA_V1, SCHEMA_V2, SCHEMA_V3, SCHEMA_V4, SCHEMA_V5
+from backend.database.schema import SCHEMA_V1, SCHEMA_V2, SCHEMA_V3, SCHEMA_V4, SCHEMA_V5, SCHEMA_V6
 
 log = logging.getLogger(__name__)
 
@@ -39,6 +39,7 @@ MIGRATIONS: tuple[Migration, ...] = (
     Migration(4, "strategy_versions, technical_indicators, strategy_signals (+ readable view)", tuple(SCHEMA_V4)),
     Migration(5, "backtests (runs, trades, daily portfolio, positions, cash, metrics) + data-quality verdicts",
               tuple(SCHEMA_V5)),
+    Migration(6, "experiment_registry, experiment_trials", tuple(SCHEMA_V6)),
 )
 
 
