@@ -221,6 +221,13 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
                            "WHERE run_id=? AND date <= ? ORDER BY date", (run_id, cut))
         trades = d.read_sql("SELECT * FROM simulated_trades WHERE run_id=? AND entry_date <= ? ORDER BY entry_date",
                             (run_id, cut))
+        # A trade entered before the cut but exited after it would reveal post-cut prices: hide its outcome.
+        late = (trades.exit_date.isna() | (trades.exit_date > cut)) & (not unseal)
+        hidden = ["exit_date", "exit_price", "exit_reason", "costs", "dividends", "pnl", "return_pct", "r_multiple",
+                  "holding_days"]
+        trades = trades.astype({c: object for c in hidden})
+        trades.loc[late, hidden] = None
+        trades["censored"] = late
         visible = ("IS", "VALIDATION") if not unseal else ("ALL", "IS", "VALIDATION", "OOS")
         m = d.read_sql("SELECT segment, metric, value FROM performance_metrics WHERE run_id=?", (run_id,))
         m = m[m.segment.isin(visible) | (m.segment.str.startswith("YEAR:") & ((m.segment.str[5:] + "-12-31") <= cut))]

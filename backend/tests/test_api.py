@@ -74,3 +74,12 @@ def test_sealed_year_metrics_never_straddle_the_cut(client):
     b = c.get(f"/api/backtests/{run_id}").json()
     years = [k[5:] for k in b["metrics"] if k.startswith("YEAR:")]
     assert years and all(f"{y}-12-31" <= b["visible_until"] for y in years)
+
+
+def test_sealed_trades_hide_exits_after_the_cut(client):
+    c, run_id, _ = client
+    b = c.get(f"/api/backtests/{run_id}").json()
+    for t in b["trades"]:
+        assert t["exit_date"] is None or t["exit_date"] <= b["visible_until"]
+        if t["censored"]:
+            assert t["pnl"] is None and t["r_multiple"] is None
