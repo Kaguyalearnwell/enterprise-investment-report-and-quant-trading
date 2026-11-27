@@ -137,10 +137,17 @@ def main() -> None:
     C["survivorship_crosscheck_tpex"] = xs
 
     # 6. Official TWSE history reachability from this host
-    r = session.get(TWSE_URL, params={"date": "20160104", "type": "ALLBUT0999", "response": "json"}, timeout=60)
-    C["twse_history_endpoint"] = {"http": r.status_code, "blocked_by_waf": "FOR SECURITY REASONS" in r.text}
-    r = session.get(TWSE_OPENAPI, timeout=60)
-    C["twse_openapi_latest_only"] = {"http": r.status_code, "rows": len(r.json()) if r.ok else None}
+    try:
+        r = session.get(TWSE_URL, params={"date": "20160104", "type": "ALLBUT0999", "response": "json"}, timeout=60)
+        C["twse_history_endpoint"] = {"http": r.status_code, "blocked_by_waf": "FOR SECURITY REASONS" in r.text}
+    except requests.RequestException as exc:
+        C["twse_history_endpoint"] = {"error": repr(exc)}
+    try:
+        r = session.get(TWSE_OPENAPI, timeout=60)
+        rows = r.json() if r.ok else []
+        C["twse_openapi_latest_only"] = {"http": r.status_code, "rows": len(rows), "dates": sorted({x.get("Date") for x in rows})[:3]}
+    except (requests.RequestException, ValueError) as exc:
+        C["twse_openapi_latest_only"] = {"error": repr(exc)}
 
     ev["failed_or_gated_calls"] = FAILURES
     OUT.parent.mkdir(parents=True, exist_ok=True)
