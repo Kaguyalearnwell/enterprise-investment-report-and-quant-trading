@@ -25,7 +25,8 @@
 | [`docs/prompt04_gap_analysis.md`](docs/prompt04_gap_analysis.md) | 修正版 Prompt（企業研究＋評級＋估值＋回測）與現有程式差異分析 |
 | [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) | **使用說明書**：功能現況、指令手冊、報告解讀、資料規則、疑難排解 |
 | [`docs/INSTALL.md`](docs/INSTALL.md) | 在你電腦上安裝、建立全市場資料庫、每日更新 |
-| [`backend/`](backend/) | Python 後端（資料管線、資料庫、指標、訊號；179 項測試） |
+| [`backend/`](backend/) | Python 後端（資料管線、資料庫、指標、訊號、回測、統計、基本面、唯讀 API；186 項測試） |
+| [`frontend/`](frontend/) | 唯讀研究 Dashboard（React＋TypeScript＋Vite＋ECharts），啟動見 USER_GUIDE §6.6 |
 
 ## 兩階段研究流程
 

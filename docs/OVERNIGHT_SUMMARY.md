@@ -1,7 +1,7 @@
-# 夜間自主作業總整理（2026-11-28 台北時間 01:24 – 約 02:00）
+# 夜間自主作業總整理（2026-11-28 台北時間 01:24 起）
 
 > 你睡前授權我「一路進行下去」。這份文件讓你不用翻對話紀錄就能檢查我做了什麼。
-> 所有程式都已 commit 並 push 到 `claude/trusting-gauss-pam41z`；**179 項測試全部通過**。
+> 所有程式都已 commit 並 push 到 `claude/trusting-gauss-pam41z`；**186 項 Python 測試全部通過**，前端 TypeScript 型別檢查與建置通過。
 
 ---
 
@@ -22,6 +22,8 @@
 | 5 | Stage 6.2 基本面資料管線 | （程式）`download fundamentals` | 每筆資料記錄「最早可用日」，回測不會用到尚未公布的財報 |
 | 6 | Stage 7.1 財務指標 | `backend/research/financial_metrics.py` | 時點正確的 TTM 指標；以台積電公布的 2024 年數字驗證 |
 | 7 | Stage 7.2 估值工具 | `backend/valuation/models.py` | DCF、反向 DCF、情境加權、安全邊際、歷史百分位（只有工具，不替任何公司估值） |
+| 8 | Dashboard 唯讀 API | `backend/api/app.py` | 只有 GET；OOS 封存延伸到 API（曲線、交易、指標、持倉） |
+| 9 | Dashboard 前端第一版 | `frontend/`、`docs/USER_GUIDE.md` §6.6 | 總覽、每日訊號（匯出 CSV／Excel）、個股圖與條件解釋、基本面、回測、統計驗證、資料品質；已在開發資料庫上實際開啟並截圖檢查（含深色模式、手機寬度） |
 
 ---
 
@@ -42,6 +44,8 @@
 |---|---|---|
 | 同日多檔訊號的隨機排序受「訊號讀入順序」影響 | 同樣資料不同路徑挑到不同股票，違反可重現性 | 先依代號固定順序（`backtest/3`）；Stage 4 報告已重跑更新 |
 | Bootstrap 與指標表的區段報酬算法不一致 | Validation Sharpe 顯示不同 | 統一 |
+| API：跨越封存點的「年度」指標（2024 年）含有 OOS 日 | 封存時仍可間接看到 OOS 績效 | 只顯示整年在封存點以前的年度 |
+| API：封存點前進場、封存點後出場的交易會顯示出場價與損益 | 洩漏封存期間價格結果 | 這類交易的出場資訊一律隱藏 |
 
 ### 3.3 資料（Stage 6）
 
@@ -90,7 +94,10 @@ b133bd7 Stage 5: full run results (IS + Validation; OOS sealed)
 500e3ea Stage 5 report, docs
 53126e9 Stage 6.2: fundamentals pipeline (schema v7 ...)
 3b163a9 Stage 7.1: point-in-time financial metrics ...
-（之後）Stage 7.2 valuation tools、本文件
+9488b3e Stage 7.2 valuation tools、本文件
+5a03e24 Dashboard API: read-only FastAPI with OOS seal
+6e0db6b Dashboard frontend (React+TS+Vite+ECharts)
+（之後）文件更新
 ```
 
 ---

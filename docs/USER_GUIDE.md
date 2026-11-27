@@ -1,6 +1,6 @@
 # 台股量化研究系統 使用說明書
 
-> 版本：Stage 5 完成、Stage 6.1 完成（2026-11-28）｜適用分支：`claude/trusting-gauss-pam41z`
+> 版本：Stage 5、6、7.1–7.2 完成；Dashboard 第一版（2026-11-28）｜適用分支：`claude/trusting-gauss-pam41z`
 > 安裝步驟的完整細節另見 [`docs/INSTALL.md`](INSTALL.md)。
 
 ---
@@ -52,7 +52,7 @@
 | 基本面資料（財報三表、月營收、股利政策、PER/PBR，含「最早可用日」） | ✅ 可用 | `download fundamentals` |
 | 時點正確的財務指標（TTM 營收成長、毛利率、ROE、FCF、盈餘品質等） | ✅ 程式可用（尚無指令／頁面） | `backend/research/financial_metrics.py` |
 | 企業與成長評級、估值、進場時機整合 | ⏳ 尚未開始 | Stage 7–8 |
-| 網頁 Dashboard、報表匯出 | ⏳ 尚未開始 | Stage 9 |
+| 網頁 Dashboard（唯讀）、訊號名單匯出 CSV／Excel | ✅ 第一版可用 | 見 §6.6 |
 | TradingView Pine Script 指標 | ⏳ 尚未開始 | Stage 3 之後 |
 | 籌碼資料手動匯入 | ⏳ 資料表已建立，匯入介面尚未開發 | 你的 APP 無匯出功能，只會做手動匯入 |
 
@@ -252,6 +252,38 @@ python -m backend.cli download <類型> [--stocks 代號 ... | --all] [選項]
 | `process --stocks ... / --all` | 還原價、漲跌停價、上市日（興櫃判定）、停牌推斷、週 K | 資料庫 |
 | `validate --stocks ... / --all` | 11 類資料品質檢查 | `reports/data_quality/dq-*.md`、`.json` |
 | `audit-survivorship [--start] [--end]` | 與櫃買中心官方月快照比對股票池 | `reports/survivorship/*.md`、`.json` |
+
+### 6.6 網頁 Dashboard（唯讀）
+
+第一次（需要 Node.js 18 以上）：
+
+```bash
+pip install -r requirements.txt          # 含 fastapi、uvicorn
+cd frontend && npm install && npm run build && cd ..
+```
+
+之後每次：
+
+```bash
+uvicorn backend.api.app:app --port 8000
+```
+
+瀏覽器打開 `http://127.0.0.1:8000`。
+
+| 頁面 | 內容 |
+|---|---|
+| 總覽 | 資料庫規模、最新日期、市場狀態、各版本當日訊號數、資料品質 |
+| 每日訊號 | 依版本／均量定義／日期篩選；匯出 CSV、Excel |
+| 個股 | 還原 K 線＋MA13/34/55＋布林帶＋訊號標記、成交量、BBW 百分位；點任一日看每個條件的判斷；時點正確的基本面指標 |
+| 回測 | 權益曲線、回撤、IS／Validation 指標、年度、交易明細 |
+| 統計驗證 | Stage 5 每個實驗的設計、摘要與試驗 |
+| 資料品質 | 檢查結果、個股判定、下載失敗、資料來源、已知限制 |
+
+**OOS 封存也延伸到網頁**：回測頁預設只顯示到 Validation 結束；跨越封存點的年度不顯示；在封存點後才出場的交易，出場價與損益一律隱藏。網址加 `?unseal=1` 才會顯示 OOS（只應在研究預設值確認後做一次）。
+
+**沒有任何寫入或交易功能**：API 只有 GET；不連券商、不下單。
+
+開發模式（改前端時）：一個終端機跑 `uvicorn ... --port 8000`，另一個在 `frontend/` 跑 `npm run dev`（Vite 會把 `/api` 轉給 8000）。
 
 ---
 
