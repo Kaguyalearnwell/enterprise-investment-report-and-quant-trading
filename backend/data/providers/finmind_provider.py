@@ -280,6 +280,11 @@ STATEMENT_DATASETS = {"income": "TaiwanStockFinancialStatements", "balance": "Ta
 
 
 def _statements(self, stock_id: str, start: str, end: str, statement: str) -> FetchResult:
+    """Values are stored exactly as FinMind returns them. Stage 6.2 live check (2330, 2024):
+    * income statement: SINGLE-QUARTER values (4 quarters sum to the annual NT$2,894.3bn revenue);
+    * cash-flow statement: YEAR-TO-DATE CUMULATIVE values (Q4 = annual NT$1,826.2bn operating cash flow);
+    * balance sheet: point-in-time balances.
+    backend/research/financial_metrics.py converts cash flows to single quarters within each fiscal year."""
     raw, status = self._request(STATEMENT_DATASETS[statement], data_id=stock_id, start_date=start, end_date=end)
     df = pd.DataFrame(raw)
     if df.empty:
