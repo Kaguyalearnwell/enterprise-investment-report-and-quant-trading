@@ -458,3 +458,18 @@ REQUIRED_TABLES = (
     "chip_daily", "chip_broker", "chip_margin", "chip_import_log",
 )
 REQUIRED_VIEWS = ("daily_prices", "dividend_history", "stock_split_history", "capital_reduction_history")
+
+
+# =====================================================================================
+# Schema v3: listing evidence found in the Stage 2 acceptance run (emerging-board history).
+# SQLite cannot change a CHECK constraint in place and security_master is referenced by
+# foreign keys, so instead of rebuilding the table a new column `listing_basis` with the
+# extended value set supersedes `listing_date_basis` (kept for compatibility, copied over).
+# =====================================================================================
+SCHEMA_V3: list[str] = [
+    f"ALTER TABLE security_master ADD COLUMN emerging_exit_date TEXT CHECK (emerging_exit_date IS NULL OR "
+    f"emerging_exit_date {DATE_CHECK})",
+    "ALTER TABLE security_master ADD COLUMN listing_basis TEXT CHECK (listing_basis IS NULL OR listing_basis IN "
+    "('official','emerging_exit','inferred_from_prices','tpex_first_seen','first_price_date'))",
+    "UPDATE security_master SET listing_basis = listing_date_basis WHERE listing_date_basis IS NOT NULL",
+]

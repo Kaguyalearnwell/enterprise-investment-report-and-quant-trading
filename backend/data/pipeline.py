@@ -24,6 +24,7 @@ import pandas as pd
 
 from backend.config.data_sources import FINMIND_API_URL, FINMIND_DATASETS, FINMIND_REQUESTS_PER_HOUR, TPEX_DAILY_QUOTES_URL
 from backend.data.normalizers.adjustments import adjust_prices
+from backend.data.normalizers.listing import resolve_listing
 from backend.data.normalizers.price_limits import compute_limits
 from backend.data.normalizers.trading_status import infer_status
 from backend.data.normalizers.weekly_prices import build_weekly
@@ -45,16 +46,20 @@ class DataPipeline:
 
     def process(self, stock_ids: Sequence[str]) -> dict[str, int]:
         days = self.db.get_trading_days("1990-01-01", self.as_of, as_of=self.as_of)
-        delist = self.db.read_sql("SELECT stock_id, delisting_date FROM security_master").set_index("stock_id")
+        delist = self.db.read_sql("SELECT stock_id, delisting_date, emerging_exit_date, listing_date, listing_basis "
+                                  "FROM security_master").set_index("stock_id")
+        tpex_seen = self.db.read_sql("SELECT stock_id, MIN(valid_from) d FROM security_history "
+                                     "WHERE evidence='tpex_monthly_snapshot' GROUP BY 1").set_index("stock_id")["d"]
         n = {"stocks": 0, "adj_rows": 0, "limit_rows": 0, "status_rows": 0, "suspension_periods": 0, "weekly_rows": 0}
         for i, sid in enumerate(stock_ids, 1):
             raw, act = self._stock_data(sid)
             if raw.empty:
                 continue
             now = utc_now()
+            listing = self._resolve_listing(sid, raw, delist, tpex_seen, now)
             adj = adjust_prices(raw, act, now)
             self.db.upsert("daily_prices_adj", adj, track_revisions=False)
-            lim = compute_limits(raw, act, now)
+            lim = compute_limits(raw, act, now, listing)
             self.db.upsert("price_limits", lim, track_revisions=False)
             dd = delist["delisting_date"].get(sid) if sid in delist.index else None
             st, sp = infer_status(raw, days, dd if pd.notna(dd) else None, now)
@@ -79,6 +84,27 @@ class DataPipeline:
             if i % 50 == 0:
                 log.info("processed %d/%d stocks", i, len(stock_ids))
         return n
+
+    def _resolve_listing(self, sid: str, raw: pd.DataFrame, master: pd.DataFrame, tpex_seen: pd.Series,
+                         now: str) -> str | None:
+        """Listing date from emerging-board evidence; returns the date used for this stock (or None)."""
+        m = master.loc[sid] if sid in master.index else None
+        if m is not None and m["listing_basis"] == "official" and pd.notna(m["listing_date"]):
+            return m["listing_date"]
+        exit_d = m["emerging_exit_date"] if m is not None and pd.notna(m["emerging_exit_date"]) else None
+        res = resolve_listing(raw, exit_d, tpex_seen.get(sid))
+        if res["listing_date"] is None:
+            return None
+        with self.db.transaction() as conn:
+            conn.execute("UPDATE security_master SET listing_date = ?, listing_basis = ? WHERE stock_id = ?",
+                         (res["listing_date"], res["listing_basis"], sid))
+            conn.execute("DELETE FROM security_history WHERE stock_id = ? AND exchange = 'EMERGING'", (sid,))
+        first = raw.loc[raw["has_price"] == 1, "date"].min()
+        self.db.upsert("security_history", [{
+            "stock_id": sid, "valid_from": first, "valid_to": res["emerging_to"], "stock_name": None,
+            "exchange": "EMERGING", "security_type": "common", "evidence": res["listing_basis"],
+            "source": "derived:listing", "ingested_at": now}], track_revisions=False)
+        return res["listing_date"]
 
     def validate(self, stock_ids: Sequence[str] | None, report_dir: Path) -> tuple[str, Path, pd.DataFrame]:
         ids = list(stock_ids) if stock_ids else self.db.read_sql(

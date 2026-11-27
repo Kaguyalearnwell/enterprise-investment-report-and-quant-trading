@@ -16,7 +16,7 @@ from __future__ import annotations
 import pandas as pd
 
 MASTER_COLUMNS = ["stock_id", "stock_name", "exchange", "industry_category", "security_type", "delisting_date",
-                  "source", "updated_at"]
+                  "emerging_exit_date", "source", "updated_at"]
 
 
 def build_security_master(listing: pd.DataFrame, delisted: pd.DataFrame, source: str,
@@ -27,11 +27,12 @@ def build_security_master(listing: pd.DataFrame, delisted: pd.DataFrame, source:
     rows, issues = [], []
     for sid in sorted(set(lst.index) | set(dl.index)):
         in_l, in_d = sid in lst.index, sid in dl.index
-        row = {"stock_id": sid, "source": source, "updated_at": updated_at, "delisting_date": None}
+        row = {"stock_id": sid, "source": source, "updated_at": updated_at, "delisting_date": None,
+               "emerging_exit_date": None}
         if in_l:
             r = lst.loc[sid]
             row.update(stock_name=r["stock_name"], exchange=r["exchange"], industry_category=r["industry_category"],
-                       security_type=r["security_type"])
+                       security_type=r["security_type"], emerging_exit_date=r.get("emerging_exit_date"))
         else:
             r = dl.loc[sid]
             row.update(stock_name=r["stock_name"], exchange="UNKNOWN", industry_category=None,

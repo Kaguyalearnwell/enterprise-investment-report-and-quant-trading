@@ -49,6 +49,7 @@ class DataQualityValidator:
         ]
         issues = pd.concat([x for x in parts if not x.empty], ignore_index=True) if any(
             not x.empty for x in parts) else pd.DataFrame(columns=checks.ISSUE_COLUMNS)
+        issues = checks.reclassify(issues, master, actions, days)
         if not issues.empty:
             self.db.insert("data_validation_log", issues.assign(run_id=run_id, created_at=utc_now()))
         log.info("data quality run %s: %d issues", run_id, len(issues))

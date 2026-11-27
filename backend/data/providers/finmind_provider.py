@@ -129,6 +129,10 @@ class FinMindProvider(DataProvider):
         rows = []
         for sid, g in df.groupby("stock_id"):
             last = g[g["date"] == g["date"].max()]
+            # FinMind docs: a stock that moved from the emerging board keeps an 'emerging' row whose
+            # date is the day it left the board.
+            em = g.loc[g["type"] == "emerging", "date"]
+            left_emerging = em.max() if not em.empty and (g["type"] != "emerging").any() else None
             rows.append({
                 "stock_id": sid,
                 "stock_name": last["stock_name"].iloc[0],
@@ -137,6 +141,7 @@ class FinMindProvider(DataProvider):
                 "security_type": classify_security(sid),
                 "info_last_seen": g["date"].max(),
                 "in_current_snapshot": bool(g["date"].max() == snapshot),
+                "emerging_exit_date": left_emerging,
             })
         out = pd.DataFrame(rows)
         out.attrs["snapshot_date"] = snapshot

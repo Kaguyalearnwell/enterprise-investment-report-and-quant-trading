@@ -261,3 +261,49 @@ def check_weekly(stored: pd.DataFrame, rebuilt: pd.DataFrame) -> pd.DataFrame:
     return _issues(diff, "weekly_prices", "weekly", "error", "weekly_aggregation_mismatch", "exclude",
                    diff.apply(lambda r: f"week {r.week_key} {r.price_basis}: {r._merge}", axis=1)
                    if not diff.empty else "")
+
+
+# ---- reclassification with listing / event context -------------------------------------------------
+PRE_LISTING_CHECKS = {"ohlc_logic", "price_limits", "returns", "volume"}
+HALT_EVENTS = {"capital_reduction", "par_value_change", "split", "reverse_split"}
+
+
+def reclassify(issues: pd.DataFrame, master: pd.DataFrame, actions: pd.DataFrame,
+               trading_days: list[str], halt_window: int = 10) -> pd.DataFrame:
+    """Re-label issues whose cause is known, without hiding them.
+
+    * bars before a stock's listing date are emerging-board bars (no opening auction, no limit):
+      severity -> info, category 'pre_listing:<original>', action 'exclude' (not tradable);
+    * a block of missing trading days that ends within `halt_window` trading days before a
+      capital reduction / par-value change / split is the exchange's pre-event trading halt.
+    """
+    if issues.empty:
+        return issues
+    out = issues.copy()
+    lst = master.set_index("stock_id")["listing_date"].dropna().to_dict() if "listing_date" in master else {}
+    pre = out["check_name"].isin(PRE_LISTING_CHECKS) & out.apply(
+        lambda r: r["stock_id"] in lst and pd.notna(r["date"]) and r["date"] < lst[r["stock_id"]], axis=1)
+    out.loc[pre, "category"] = "pre_listing:" + out.loc[pre, "category"]
+    out.loc[pre, ["severity", "action"]] = ["info", "exclude"]
+    if not actions.empty:
+        cal = sorted(trading_days)
+        pos = {d: i for i, d in enumerate(cal)}
+        ev = actions[actions["action_type"].isin(HALT_EVENTS)]
+        evs = {}
+        for sid, d in zip(ev["stock_id"], ev["ex_date"]):
+            evs.setdefault(sid, []).append(d)
+        miss = out["category"] == "missing_trading_days"
+        for i in out.index[miss]:
+            sid, det = out.at[i, "stock_id"], str(out.at[i, "detail"])
+            last = det.rsplit("..", 1)[-1].strip()
+            if last not in pos:
+                continue
+            for e in evs.get(sid, []):
+                after = [d for d in cal if d >= e]
+                if after and 0 <= pos[after[0]] - pos[last] <= halt_window:
+                    out.at[i, "category"] = "pre_event_halt"
+                    out.at[i, "severity"] = "info"
+                    out.at[i, "action"] = "keep"
+                    out.at[i, "detail"] = f"{det}; trading halt before {e} corporate action"
+                    break
+    return out
