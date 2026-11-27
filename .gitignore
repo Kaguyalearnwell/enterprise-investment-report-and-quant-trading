@@ -1,4 +1,7 @@
 __pycache__/
 .pytest_cache/
-taiwan_quant_system/data/*
-!taiwan_quant_system/data/.gitkeep
+.env
+# data files are never committed; keep only the empty directory skeleton
+taiwan_quant_system/data/**
+!taiwan_quant_system/data/**/
+!taiwan_quant_system/data/**/.gitkeep
