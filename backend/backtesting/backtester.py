@@ -26,7 +26,7 @@ from backend.database.db_manager import DatabaseManager, utc_now
 from backend.database.schema import ENTRY_BITS
 
 log = logging.getLogger(__name__)
-CODE_VERSION = "backtest/1"
+CODE_VERSION = "backtest/2"   # /2: share-count events rescale entry prices for open risk; R on entry values
 
 
 def cost_model(cfg: dict, scenario: str, slippage_end: str) -> CostModel:
@@ -99,8 +99,10 @@ class Backtester:
             actions.setdefault(r["ex_date"], []).append(r)
         m = self.db.read_sql(f"SELECT stock_id, stock_name, industry_category, delisting_date, last_price_date "
                              f"FROM security_master WHERE stock_id IN ({ph})", ids)
-        meta = {r.stock_id: {"name": r.stock_name, "industry": r.industry_category, "delisting_date": r.delisting_date,
-                             "last_price_date": r.last_price_date} for r in m.itertuples(index=False)}
+        nn = lambda x: None if x is None or (isinstance(x, float) and math.isnan(x)) else x  # noqa: E731  NaN -> None
+        meta = {r.stock_id: {"name": nn(r.stock_name), "industry": nn(r.industry_category),
+                             "delisting_date": nn(r.delisting_date), "last_price_date": nn(r.last_price_date)}
+                for r in m.itertuples(index=False)}
         return days, bars, signals, actions, meta, int(len(sig))
 
     # ---- run -----------------------------------------------------------------------------------
@@ -120,7 +122,7 @@ class Backtester:
         run_id = f"bt-{dt.datetime.now(dt.UTC).strftime('%Y%m%dT%H%M%S')}-{uuid.uuid4().hex[:6]}"
         dv = self.db.read_sql("SELECT MAX(version_id) v FROM data_versions").v[0]
         status = "formal" if not excluded.get("no_verdict") and dv is not None else "exploratory"
-        params = {"cfg": self.cfg, "cost": cost.__dict__, "signals_in_period": n_sig}
+        params = {"cfg": self.cfg, "cost": cost.__dict__, "signals_in_period": n_sig, "skipped": res.skipped}
         self.db.insert("backtest_runs", [{          # append-only: a run is never updated
             "run_id": run_id, "created_at": utc_now(), "mode": mode, "strategy_version_id": strategy_version_id,
             "entry_version": entry_version, "start_date": days[0], "end_date": days[-1], "universe_size": len(ids),

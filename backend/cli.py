@@ -30,6 +30,7 @@ from backend.data.providers.official_provider import TPExProvider
 from backend.data.validators.survivorship_audit import SurvivorshipAudit, write_survivorship_report
 from backend.config.strategy_config import load_config
 from backend.strategies.runner import SignalRunner, daily_screen, explain
+from backend.backtesting.backtester import Backtester
 from backend.data.providers.finmind_provider import FinMindProvider
 from backend.database.db_manager import DatabaseManager
 from backend.core.logger import setup_logging
@@ -79,6 +80,24 @@ def _parser() -> argparse.ArgumentParser:
     se.add_argument("stock")
     se.add_argument("date")
     se.add_argument("--volume-mode", default="include_today", choices=["include_today", "prior_20"])
+    bt = sub.add_parser("backtest", help="historical simulation (no real orders)")
+    bsub = bt.add_subparsers(dest="bt_cmd", required=True)
+    br = bsub.add_parser("run", help="run a backtest; every run is stored with a new run id")
+    gbr = br.add_mutually_exclusive_group(required=True)
+    gbr.add_argument("--stocks", nargs="+")
+    gbr.add_argument("--all", action="store_true")
+    br.add_argument("--mode", choices=["portfolio", "single_stock"], default="portfolio")
+    br.add_argument("--version", default="E", choices=["A", "B", "C", "D", "E", "S0"])
+    br.add_argument("--volume-mode", default="include_today", choices=["include_today", "prior_20"])
+    br.add_argument("--cost", default="base", choices=["optimistic", "base", "stress"])
+    br.add_argument("--slippage", default="low", choices=["low", "high"], help="end of the scenario's slippage range")
+    br.add_argument("--basis", default=None, choices=["adjusted", "raw"], help="trailing-stop basis (default: config)")
+    br.add_argument("--start", default="2015-01-01")
+    br.add_argument("--end", default=None)
+    bsub.add_parser("list", help="list stored backtest runs")
+    bs = bsub.add_parser("show", help="metrics of one run (In-Sample only unless --unseal)")
+    bs.add_argument("run_id")
+    bs.add_argument("--unseal", action="store_true", help="also show VALIDATION / OOS (see Stage 4 report)")
     sub.add_parser("registry", help="seed / refresh data_source_registry")
     v = sub.add_parser("version", help="record a data version fingerprint")
     v.add_argument("description")
@@ -141,6 +160,29 @@ def main(argv: list[str] | None = None) -> int:
                   .to_string(index=False))
             if args.csv:
                 df.to_csv(args.csv, index=False, encoding="utf-8-sig")
+        return 0
+    if args.cmd == "backtest":
+        cfg = load_config()
+        if args.bt_cmd == "run":
+            vid = SignalRunner(db, cfg, as_of).register_version(args.volume_mode)
+            out = Backtester(db, cfg).run(strategy_version_id=vid, entry_version=args.version,
+                                          stock_ids=None if args.all else args.stocks, mode=args.mode,
+                                          start=args.start, end=args.end, cost_scenario=args.cost,
+                                          slippage_end=args.slippage, trailing_basis=args.basis)
+            m = out["metrics"].get("IS", {})
+            print(f"run {out['run_id']} ({out['status']}), universe {out['universe']}, excluded {out['excluded']}")
+            print("In-Sample:", {k: round(m[k], 4) for k in ("trades", "win_rate", "profit_factor", "cagr",
+                                                              "max_drawdown", "sharpe", "expectancy_r") if k in m})
+            print("VALIDATION / OOS metrics are stored but sealed until Stage 5 (backtest show --unseal).")
+            return 0
+        if args.bt_cmd == "list":
+            print(db.read_sql("SELECT run_id, created_at, mode, entry_version, cost_scenario, slippage_bps, "
+                              "trailing_basis, universe_size, status FROM backtest_runs ORDER BY created_at").to_string(index=False))
+            return 0
+        segs = ("ALL", "IS", "VALIDATION", "OOS") if args.unseal else ("IS",)
+        m = db.read_sql("SELECT segment, metric, value FROM performance_metrics WHERE run_id = ?", (args.run_id,))
+        piv = m[m.segment.isin(segs)].pivot(index="metric", columns="segment", values="value")
+        print(piv.to_string())
         return 0
     if args.cmd == "registry":
         log.info("data_source_registry rows written: %d", seed_source_registry(db))

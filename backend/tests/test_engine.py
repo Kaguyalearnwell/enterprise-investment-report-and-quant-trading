@@ -171,3 +171,26 @@ def test_no_lookahead_future_bars_do_not_change_the_past(cfg):
         b2[d] = bar(50.0, 51.0, 49.0, 50.0)
     res2 = run(cfg, b2, signal(DAYS[1]))
     assert res.daily[:k + 1] == res2.daily[:k + 1]
+
+
+def test_meta_without_delisting_date_is_handled(cfg):
+    """Regression (real data): a missing delisting date must not break the delisting check."""
+    b = flat(n=6)
+    res = run(cfg, b, signal(DAYS[1]), meta={"9999": {"industry": None, "name": None, "delisting_date": None}},
+              days=DAYS[:12])
+    assert only_trade(res)["exit_reason"] == "OPEN_AT_END"
+
+
+def test_par_value_change_keeps_risk_and_r_in_entry_units(cfg):
+    """Regression (real data, 2025): after a 10:1 par-value change open risk exploded to 28% of equity because
+    the entry price stayed in old units while shares were rescaled. R must use entry values."""
+    b = {d: bar(100.0, 100.5, 99.5, 100.0, pf=0.1) for d in DAYS[:5]}
+    b.update({d: bar(10.0, 10.05, 9.95, 10.0, pf=1.0, atr=0.2) for d in DAYS[5:8]})
+    b[DAYS[8]] = bar(9.4, 9.45, 9.3, 9.4, pf=1.0, atr=0.2)           # below the stop 9.5 (=95 in old units): gap
+    acts = {DAYS[5]: [{"stock_id": "9999", "action_type": "par_value_change", "before_price": 100.0,
+                       "reference_price": 10.0}]}
+    res = run(cfg, b, signal(DAYS[1]), acts, days=DAYS[:10])
+    t = only_trade(res)
+    assert t["shares"] == 1000 and t["entry_price"] == 100.0           # reported in entry units
+    assert max(r["open_risk"] / r["equity"] for r in res.daily) < 0.006  # ~0.5%, not 5x more
+    assert t["r_multiple"] == pytest.approx(t["pnl"] / 5000.0)         # 1,000 shares x (100 - 95)

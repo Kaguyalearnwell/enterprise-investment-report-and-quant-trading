@@ -61,14 +61,16 @@ class Position:
     industry: str | None
     signal_date: str
     entry_date: str
-    entry_price: float           # raw fill
-    shares: float
-    initial_stop: float          # raw, at entry
+    entry_price: float           # raw fill AT ENTRY (reported as is)
+    shares: float                # current shares (changes with splits / stock dividends / capital reductions)
+    initial_stop: float          # raw initial stop AT ENTRY (reported as is)
     stop_basis_entry: float      # entry price in the trailing basis
     stop_basis: float            # current stop in the trailing basis (only rises)
     r_basis: float               # 1R in the trailing basis
     hc_basis: float = -math.inf  # highest close since entry in the trailing basis
     stop_raw: float = 0.0        # stop in raw prices as of the last priced bar (used for open risk)
+    entry_shares: float = 0.0    # shares bought (R multiple is always measured on entry values)
+    px_scale: float = 1.0        # cumulative ref/before of share-count events: entry_price * px_scale = current units
     bars_held: int = 0
     below_ma34: int = 0
     last_price: float = 0.0
@@ -139,7 +141,7 @@ class PortfolioEngine:
             p.costs += fee + tax
             pnl = value - fee - tax - p.invested + p.dividends
             realized += pnl
-            risk = p.shares * (p.entry_price - p.initial_stop)
+            risk = p.entry_shares * (p.entry_price - p.initial_stop)
             res.trades.append(self._trade_row(p, d, px, reason, pnl, risk, closed=True, meta=meta))
             del pos[p.stock_id]
 
@@ -159,6 +161,7 @@ class PortfolioEngine:
                     ledger(d, "dividend", div, p.stock_id, p.trade_id)
                 elif a["action_type"] in SHARE_EVENTS and ref > 0:
                     p.shares *= before / ref
+                    p.px_scale *= ref / before      # keep per-share prices in the same units as the shares
                     if self.basis == "raw":     # raw variant still follows share-count changes
                         f = ref / before
                         p.stop_basis *= f
@@ -181,7 +184,7 @@ class PortfolioEngine:
             # 2. open: entries -------------------------------------------------------------------
             if pending:
                 mv = sum(p.shares * p.last_price for p in pos.values())
-                open_risk = sum(p.shares * max(p.entry_price - p.stop_raw, 0.0) for p in pos.values())
+                open_risk = sum(p.shares * max(p.entry_price * p.px_scale - p.stop_raw, 0.0) for p in pos.values())
                 for s in self._ranked(pending, d):
                     sid = s["stock_id"]
                     if sid in pos:
@@ -224,7 +227,8 @@ class PortfolioEngine:
                     ledger(d, "commission", -fee, sid, tid)
                     e_b, s_b = self._to_basis(fill, bar), self._to_basis(stop, bar)
                     p = Position(tid, sid, ind, s["signal_date"], d, fill, float(shares), stop, e_b, s_b, e_b - s_b,
-                                 last_price=bar.open, stop_raw=stop, costs=fee, invested=value + fee)
+                                 last_price=bar.open, stop_raw=stop, costs=fee, invested=value + fee,
+                                 entry_shares=float(shares))
                     pos[sid] = p
                     mv += value
                     open_risk += shares * (fill - stop)
@@ -277,7 +281,7 @@ class PortfolioEngine:
             mv = sum(p.shares * p.last_price for p in pos.values())
             equity = cash + mv
             unreal = sum(p.shares * p.last_price - p.invested + p.dividends for p in pos.values())
-            o_risk = sum(p.shares * max(p.entry_price - p.stop_raw, 0.0) for p in pos.values())
+            o_risk = sum(p.shares * max(p.entry_price * p.px_scale - p.stop_raw, 0.0) for p in pos.values())
             res.daily.append({"date": d, "equity": equity, "cash": cash, "market_value": mv,
                               "exposure": mv / equity if equity > 0 else 0.0, "open_risk": o_risk,
                               "n_positions": len(pos), "realized_pnl": realized, "unrealized_pnl": unreal})
@@ -292,7 +296,7 @@ class PortfolioEngine:
 
         for p in list(pos.values()):       # still open at the end: marked to market, not a real exit
             pnl = p.shares * p.last_price - p.invested + p.dividends
-            risk = p.shares * (p.entry_price - p.initial_stop)
+            risk = p.entry_shares * (p.entry_price - p.initial_stop)
             res.trades.append(self._trade_row(p, None, p.last_price, "OPEN_AT_END", pnl, risk, closed=False, meta=meta))
         return res
 
@@ -307,7 +311,7 @@ class PortfolioEngine:
     def _trade_row(p: Position, exit_date, exit_price, reason, pnl, risk, closed, meta) -> dict:
         return {"trade_id": p.trade_id, "stock_id": p.stock_id, "stock_name": meta.get(p.stock_id, {}).get("name"),
                 "industry": p.industry, "signal_date": p.signal_date, "entry_date": p.entry_date,
-                "entry_price": p.entry_price, "initial_stop": p.initial_stop, "shares": p.shares,
+                "entry_price": p.entry_price, "initial_stop": p.initial_stop, "shares": p.entry_shares,
                 "invested": p.invested, "exit_date": exit_date, "exit_price": exit_price, "exit_reason": reason,
                 "costs": p.costs, "dividends": p.dividends, "pnl": pnl,
                 "return_pct": pnl / p.invested if p.invested else None,
