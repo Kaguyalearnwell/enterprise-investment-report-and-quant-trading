@@ -12,7 +12,7 @@ import pytest
 from backend.config.settings import get_settings
 from backend.database.db_manager import DatabaseManager, utc_now
 from backend.database.migrations import MIGRATIONS, Migration, MigrationError, apply_migrations
-from backend.database.schema import REQUIRED_TABLES
+from backend.database.schema import REQUIRED_TABLES, REQUIRED_VIEWS
 
 NOW = "2026-11-27T00:00:00+00:00"
 
@@ -43,14 +43,48 @@ def price(stock_id="2330", date="2024-01-02", close=593.0, **kw):
 
 
 # ---- schema & migrations -------------------------------------------------------------
-def test_all_required_tables_exist(db):
+def test_all_required_tables_and_views_exist(db):
     assert set(REQUIRED_TABLES) <= set(db.tables())
-    assert db.schema_version == 1
+    views = {r[0] for r in db.conn.execute("SELECT name FROM sqlite_master WHERE type='view'")}
+    assert set(REQUIRED_VIEWS) <= views
+    assert db.schema_version == 2
 
 
 def test_migrations_are_idempotent(db):
     assert db.initialize() == []
-    assert db.schema_version == 1
+    assert db.schema_version == 2
+
+
+def test_upgrade_v1_to_v2_keeps_data(tmp_path):
+    """A database created by the v1 code (e.g. an earlier download) must upgrade in place."""
+    path = tmp_path / "old.sqlite"
+    conn = sqlite3.connect(path, isolation_level=None)
+    apply_migrations(conn, MIGRATIONS[:1])
+    conn.execute("INSERT INTO download_log (dataset, stock_id, start_date, end_date, status, updated_at) "
+                 "VALUES ('TaiwanStockPrice','2330','2013-01-01','2026-11-26','success',?)", (NOW,))
+    conn.execute("INSERT INTO market_calendar VALUES ('2026-11-26','TWSE',1,'regular','t',?)", (NOW,))
+    conn.close()
+    d = DatabaseManager(path)
+    assert d.initialize() == [2]
+    assert d.completed_downloads("TaiwanStockPrice").stock_id.tolist() == ["2330"]
+    assert d.get_trading_days("2026-01-01", "2026-12-31", as_of="2026-11-27") == ["2026-11-26"]
+    assert "download_log" not in d.tables() and "market_calendar" not in d.tables()
+    d.close()
+
+
+def test_spec_views(db):
+    db.upsert("daily_prices_raw", [price()])
+    db.upsert("daily_prices_adj", [{"stock_id": "2330", "date": "2024-01-02", "adj_open": 580.0, "adj_high": 583.0,
+                                    "adj_low": 579.0, "adj_close": 583.0, "adj_volume": 27997826.0,
+                                    "price_factor": 583 / 593, "volume_factor": 1.0, "method": "test",
+                                    "factor_as_of": "2026-09-16", "computed_at": NOW}])
+    row = db.read_sql("SELECT close, adj_close FROM daily_prices WHERE stock_id='2330'").iloc[0]
+    assert (row.close, row.adj_close) == (593.0, 583.0)
+    ca = {"stock_id": "2330", "ex_date": "2024-06-13", "action_type": "cash_dividend", "cash_dividend": 4.0,
+          "raw_payload": "{}", "source": "t", "ingested_at": NOW}
+    db.upsert("corporate_actions", [ca, {**ca, "ex_date": "2025-06-18", "action_type": "split", "cash_dividend": None}])
+    assert db.read_sql("SELECT COUNT(*) n FROM dividend_history").n[0] == 1
+    assert db.read_sql("SELECT COUNT(*) n FROM stock_split_history").n[0] == 1
 
 
 def test_edited_migration_is_refused(db):
@@ -155,14 +189,14 @@ def test_download_log_attempts_and_resume(db):
     db.log_download("TaiwanStockPrice", "2330", "2013-01-01", "2026-11-27", "failed", http_status=500, error_message="x")
     assert db.completed_downloads("TaiwanStockPrice").empty
     db.log_download("TaiwanStockPrice", "2330", "2013-01-01", "2026-11-27", "success", row_count=3393)
-    log = db.read_sql("SELECT * FROM download_log")
+    log = db.read_sql("SELECT * FROM data_download_log")
     assert len(log) == 1 and log.attempts[0] == 2 and log.status[0] == "success"
     assert db.completed_downloads("TaiwanStockPrice").stock_id.tolist() == ["2330"]
 
 
 # ---- point-in-time readers ---------------------------------------------------------------
 def test_trading_days_never_beyond_as_of(db):
-    db.upsert("market_calendar", [{"date": d, "exchange": "TWSE", "is_trading_day": 1, "session_type": "regular",
+    db.upsert("trading_calendar", [{"date": d, "exchange": "TWSE", "is_trading_day": 1, "session_type": "regular",
                                    "source": "t", "ingested_at": NOW}
                                   for d in ["2026-11-26", "2026-11-27", "2026-11-30", "2027-01-04"]])
     assert db.get_trading_days("2026-01-01", "2027-12-31", as_of="2026-11-27") == ["2026-11-26", "2026-11-27"]

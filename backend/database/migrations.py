@@ -14,7 +14,7 @@ import logging
 import sqlite3
 from dataclasses import dataclass
 
-from backend.database.schema import SCHEMA_V1
+from backend.database.schema import SCHEMA_V1, SCHEMA_V2
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +33,8 @@ class Migration:
 
 MIGRATIONS: tuple[Migration, ...] = (
     Migration(1, "initial schema: 9 core tables + revisions, quality issues, benchmark index", tuple(SCHEMA_V1)),
+    Migration(2, "platform spec names; security_history, weekly_prices, suspension/disposition history, "
+                 "data_source_registry, data_versions, chip tables; spec views", tuple(SCHEMA_V2)),
 )
 
 

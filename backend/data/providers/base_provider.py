@@ -55,7 +55,7 @@ class DataProvider(ABC):
 
     @abstractmethod
     def trading_calendar(self, as_of: str) -> FetchResult:
-        """Trading days up to `as_of` (never later) -> market_calendar columns."""
+        """Trading days up to `as_of` (never later) -> trading_calendar columns."""
 
     @abstractmethod
     def market_corporate_actions(self, start: str, end: str) -> FetchResult:

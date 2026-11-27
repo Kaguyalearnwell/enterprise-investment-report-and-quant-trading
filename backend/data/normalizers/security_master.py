@@ -21,7 +21,7 @@ MASTER_COLUMNS = ["stock_id", "stock_name", "exchange", "industry_category", "se
 
 def build_security_master(listing: pd.DataFrame, delisted: pd.DataFrame, source: str,
                           updated_at: str) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Return (security_master rows, issues). Issues use data_quality_issues columns minus run/created."""
+    """Return (security_master rows, issues). Issues use data_validation_log columns minus run/created."""
     lst = listing.set_index("stock_id") if not listing.empty else pd.DataFrame()
     dl = delisted.set_index("stock_id") if not delisted.empty else pd.DataFrame()
     rows, issues = [], []

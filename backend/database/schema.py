@@ -256,3 +256,205 @@ REQUIRED_TABLES = (
     "security_master", "daily_prices_raw", "daily_prices_adj", "corporate_actions", "price_limits",
     "trading_status", "industry_history", "market_calendar", "download_log",
 )
+
+
+# =====================================================================================
+# Schema v2 (platform spec section 6.3): rename to spec names, add data-side tables and views.
+# Strategy / backtest tables are added in v3 together with the code that writes them.
+# =====================================================================================
+SCHEMA_V2: list[str] = [
+    # --- renames to the platform spec names ------------------------------------------
+    "ALTER TABLE market_calendar RENAME TO trading_calendar",
+    "ALTER TABLE download_log RENAME TO data_download_log",
+    "ALTER TABLE data_quality_issues RENAME TO data_validation_log",
+    "ALTER TABLE industry_history RENAME TO industry_classification",
+    # --- security_history: validity periods of name / exchange / type (SCD type 2) -----
+    f"""
+    CREATE TABLE security_history (
+        stock_id      TEXT NOT NULL,
+        {_date('valid_from')},
+        {_date('valid_to', True)},
+        stock_name    TEXT,
+        exchange      TEXT NOT NULL CHECK (exchange IN ('TWSE','TPEX','EMERGING','UNKNOWN')),
+        security_type TEXT,
+        evidence      TEXT NOT NULL,      -- e.g. 'tpex_monthly_snapshot'
+        source        TEXT NOT NULL,
+        {_ts('ingested_at')},
+        PRIMARY KEY (stock_id, valid_from, exchange),
+        CHECK (valid_to IS NULL OR valid_to >= valid_from)
+    ) STRICT
+    """,
+    # --- weekly_prices: built from daily bars; week_end = actual last trading day -------
+    f"""
+    CREATE TABLE weekly_prices (
+        stock_id     TEXT NOT NULL,
+        week_key     INTEGER NOT NULL CHECK (week_key BETWEEN 199001 AND 209953),   -- ISO year*100 + week
+        price_basis  TEXT NOT NULL CHECK (price_basis IN ('raw','adj')),
+        {_date('week_start')},           -- first trading day of the week
+        {_date('week_end')},             -- last trading day of the week (not necessarily Friday)
+        open REAL, high REAL, low REAL, close REAL,
+        volume       REAL,
+        trading_days INTEGER NOT NULL CHECK (trading_days BETWEEN 1 AND 7),
+        complete     INTEGER NOT NULL CHECK (complete IN (0,1)),   -- 1 only when the week is over at build time
+        {_date('built_as_of')},
+        {_ts('computed_at')},
+        PRIMARY KEY (stock_id, week_key, price_basis)
+    ) STRICT, WITHOUT ROWID
+    """,
+    "CREATE INDEX ix_weekly_prices_week_end ON weekly_prices (week_end)",
+    # --- period tables -----------------------------------------------------------------
+    f"""
+    CREATE TABLE suspension_history (
+        stock_id   TEXT NOT NULL,
+        {_date('start_date')},
+        {_date('end_date')},
+        trading_days INTEGER NOT NULL CHECK (trading_days >= 1),
+        basis      TEXT NOT NULL CHECK (basis IN ('official','inferred')),
+        reason     TEXT,
+        source     TEXT NOT NULL,
+        {_ts('ingested_at')},
+        PRIMARY KEY (stock_id, start_date, basis),
+        CHECK (end_date >= start_date)
+    ) STRICT
+    """,
+    f"""
+    CREATE TABLE disposition_history (
+        stock_id   TEXT NOT NULL,
+        {_date('start_date')},
+        {_date('end_date')},
+        measure    TEXT,
+        condition  TEXT,
+        {_date('announced_date', True)},
+        source     TEXT NOT NULL,
+        {_ts('ingested_at')},
+        PRIMARY KEY (stock_id, start_date),
+        CHECK (end_date >= start_date)
+    ) STRICT
+    """,
+    # --- data management -----------------------------------------------------------------
+    f"""
+    CREATE TABLE data_source_registry (
+        source_id          TEXT NOT NULL PRIMARY KEY,
+        name               TEXT NOT NULL,
+        provider           TEXT NOT NULL,
+        access_method      TEXT NOT NULL,
+        endpoint           TEXT,
+        tier_required      TEXT,
+        {_date('coverage_start', True)},
+        coverage_note      TEXT,
+        fields             TEXT CHECK (fields IS NULL OR json_valid(fields)),
+        usage_limits       TEXT,
+        update_frequency   TEXT,
+        completeness_notes TEXT,
+        verification       TEXT NOT NULL,     -- how the facts above were verified
+        {_date('verified_on')},
+        target_table       TEXT,
+        {_ts('updated_at')}
+    ) STRICT
+    """,
+    f"""
+    CREATE TABLE data_versions (
+        version_id      INTEGER PRIMARY KEY,
+        {_ts('created_at')},
+        {_date('as_of')},
+        description     TEXT NOT NULL,
+        row_counts      TEXT NOT NULL CHECK (json_valid(row_counts)),
+        last_revision_id INTEGER,
+        content_hash    TEXT NOT NULL
+    ) STRICT
+    """,
+    # --- optional chip-data module (manual import only; never part of the baseline) -----------
+    f"""
+    CREATE TABLE chip_import_log (
+        import_id     INTEGER PRIMARY KEY,
+        file_name     TEXT NOT NULL,
+        file_sha256   TEXT NOT NULL UNIQUE,
+        source        TEXT NOT NULL,
+        field_mapping TEXT NOT NULL CHECK (json_valid(field_mapping)),
+        rows_imported INTEGER NOT NULL DEFAULT 0,
+        status        TEXT NOT NULL CHECK (status IN ('imported','rejected','partial')),
+        notes         TEXT,
+        {_ts('imported_at')}
+    ) STRICT
+    """,
+    f"""
+    CREATE TABLE chip_daily (
+        stock_id       TEXT NOT NULL,
+        {_date('date')},
+        metric         TEXT NOT NULL,     -- e.g. 'foreign_net_buy_shares'
+        value          REAL,
+        {_date('available_from')},        -- first trading day the value may be used (default t+1)
+        published_at   TEXT,
+        import_id      INTEGER NOT NULL REFERENCES chip_import_log (import_id),
+        PRIMARY KEY (stock_id, date, metric)
+    ) STRICT, WITHOUT ROWID
+    """,
+    f"""
+    CREATE TABLE chip_broker (
+        stock_id       TEXT NOT NULL,
+        {_date('date')},
+        broker_id      TEXT NOT NULL,
+        broker_name    TEXT,
+        buy_shares     REAL,
+        sell_shares    REAL,
+        {_date('available_from')},
+        import_id      INTEGER NOT NULL REFERENCES chip_import_log (import_id),
+        PRIMARY KEY (stock_id, date, broker_id)
+    ) STRICT, WITHOUT ROWID
+    """,
+    f"""
+    CREATE TABLE chip_margin (
+        stock_id        TEXT NOT NULL,
+        {_date('date')},
+        margin_balance  REAL,
+        short_balance   REAL,
+        {_date('available_from')},
+        source          TEXT NOT NULL,
+        import_id       INTEGER REFERENCES chip_import_log (import_id),
+        PRIMARY KEY (stock_id, date)
+    ) STRICT, WITHOUT ROWID
+    """,
+    # --- views with the spec names (one fact, one place) -----------------------------------
+    """
+    CREATE VIEW daily_prices AS
+    SELECT r.stock_id, r.date, r.open, r.high, r.low, r.close, r.volume, r.turnover, r.trade_count, r.has_price,
+           a.adj_open, a.adj_high, a.adj_low, a.adj_close, a.adj_volume, a.price_factor, a.method AS adj_method
+    FROM daily_prices_raw r LEFT JOIN daily_prices_adj a ON a.stock_id = r.stock_id AND a.date = r.date
+    """,
+    """
+    CREATE VIEW dividend_history AS SELECT * FROM corporate_actions
+    WHERE action_type IN ('cash_dividend','stock_dividend','cash_and_stock_dividend')
+    """,
+    """
+    CREATE VIEW stock_split_history AS SELECT * FROM corporate_actions
+    WHERE action_type IN ('split','reverse_split','par_value_change')
+    """,
+    """
+    CREATE VIEW capital_reduction_history AS SELECT * FROM corporate_actions WHERE action_type = 'capital_reduction'
+    """,
+]
+
+TABLE_KEYS.update({
+    "trading_calendar": ("date", "exchange"),
+    "data_download_log": ("dataset", "stock_id", "start_date", "end_date"),
+    "industry_classification": ("stock_id", "effective_date"),
+    "security_history": ("stock_id", "valid_from", "exchange"),
+    "weekly_prices": ("stock_id", "week_key", "price_basis"),
+    "suspension_history": ("stock_id", "start_date", "basis"),
+    "disposition_history": ("stock_id", "start_date"),
+    "data_source_registry": ("source_id",),
+    "chip_daily": ("stock_id", "date", "metric"),
+    "chip_broker": ("stock_id", "date", "broker_id"),
+    "chip_margin": ("stock_id", "date"),
+})
+for _old in ("market_calendar", "download_log", "industry_history"):
+    TABLE_KEYS.pop(_old, None)
+
+REQUIRED_TABLES = (
+    "security_master", "security_history", "industry_classification",
+    "daily_prices_raw", "daily_prices_adj", "weekly_prices", "trading_calendar",
+    "corporate_actions", "trading_status", "price_limits", "suspension_history", "disposition_history",
+    "data_download_log", "data_validation_log", "data_source_registry", "data_versions",
+    "chip_daily", "chip_broker", "chip_margin", "chip_import_log",
+)
+REQUIRED_VIEWS = ("daily_prices", "dividend_history", "stock_split_history", "capital_reduction_history")

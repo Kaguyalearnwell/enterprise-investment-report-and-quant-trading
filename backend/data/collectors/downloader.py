@@ -2,7 +2,7 @@
 
 How resume works
 ----------------
-Every request is recorded in `download_log` (dataset, stock, start, end, status).
+Every request is recorded in `data_download_log` (dataset, stock, start, end, status).
 Before fetching, the downloader computes what is still missing from the log:
 
     already covered  [cov_start ........ cov_end]
@@ -39,7 +39,7 @@ from backend.data.normalizers.security_master import build_security_master
 log = logging.getLogger(__name__)
 
 DATASETS = {
-    # name: (provider method, target table, dataset id in download_log, overlap days)
+    # name: (provider method, target table, dataset id in data_download_log, overlap days)
     "prices": ("daily_prices", "daily_prices_raw", "TaiwanStockPrice", 7),
     "dividends": ("dividends", "corporate_actions", "TaiwanStockDividendResult", 60),
     "capital_reductions": ("capital_reductions", "corporate_actions", "TaiwanStockCapitalReductionReferencePrice", 60),
@@ -131,14 +131,14 @@ class Downloader:
             master, issues = build_security_master(lst.data, dl.data, self.provider.name, utc_now())
             res = self.db.upsert("security_master", master)
             if not issues.empty:
-                self.db.insert("data_quality_issues", issues.assign(run_id=run_id, created_at=utc_now()))
+                self.db.insert("data_validation_log", issues.assign(run_id=run_id, created_at=utc_now()))
             log.info("security_master: %s; %d reconciliation issues", res, len(issues))
             return res.written + res.unchanged
 
         def calendar() -> int:
             cal = self.provider.trading_calendar(self.as_of)
             self._archive("TaiwanStockTradingDate", "all", start, self.as_of, cal)
-            self.db.upsert("market_calendar", self._stamp(cal.data))
+            self.db.upsert("trading_calendar", self._stamp(cal.data))
             return len(cal.data)
 
         def market_actions() -> int:
@@ -146,7 +146,7 @@ class Downloader:
             self._archive("MarketCorporateActions", "all", start, self.as_of, ca)
             unmapped = ca.data.attrs.get("unmapped", [])
             if unmapped:
-                self.db.insert("data_quality_issues", [{
+                self.db.insert("data_validation_log", [{
                     "run_id": run_id, "table_name": "corporate_actions", "stock_id": str(u.get("stock_id")),
                     "date": u.get("date"), "check_name": "unmapped_action_type", "severity": "warning",
                     "category": "unknown_type", "detail": json.dumps(u, ensure_ascii=False), "action": "flag",
@@ -194,7 +194,7 @@ class Downloader:
         if start > end:
             return []
         done = self.db.read_sql(
-            "SELECT start_date, end_date FROM download_log WHERE dataset = ? AND stock_id = ? "
+            "SELECT start_date, end_date FROM data_download_log WHERE dataset = ? AND stock_id = ? "
             "AND status IN ('success','empty')", (log_name, stock_id))
         if force or done.empty:
             return [(start, end)]
@@ -275,7 +275,7 @@ class Downloader:
                                                 "industry_category": None, "security_type": classify_security(sid),
                                                 "delisting_date": None, "source": "downloader:auto",
                                                 "updated_at": utc_now()}])
-            self.db.insert("data_quality_issues", [{
+            self.db.insert("data_validation_log", [{
                 "run_id": f"download-{utc_now()}", "table_name": "security_master", "stock_id": sid, "date": None,
                 "check_name": "universe_reconciliation", "severity": "warning", "category": "not_in_any_list",
                 "detail": "price data exists but code is in neither listing nor delisting table", "action": "flag",

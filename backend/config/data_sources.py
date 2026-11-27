@@ -30,7 +30,7 @@ FINMIND_DATASETS: dict[str, DatasetSpec] = {
         DatasetSpec("TaiwanStockInfo", True, False,
                     ("industry_category", "stock_id", "stock_name", "type", "date"), None, "security_master"),
         DatasetSpec("TaiwanStockDelisting", True, False, ("date", "stock_id", "stock_name"), "2001-01-01", "security_master"),
-        DatasetSpec("TaiwanStockTradingDate", True, False, ("date",), "1999-01-05", "market_calendar"),
+        DatasetSpec("TaiwanStockTradingDate", True, False, ("date",), "1999-01-05", "trading_calendar"),
         DatasetSpec("TaiwanStockPrice", True, True,
                     ("date", "stock_id", "Trading_Volume", "Trading_money", "open", "max", "min", "close", "spread",
                      "Trading_turnover"), "1994-10-01", "daily_prices_raw"),

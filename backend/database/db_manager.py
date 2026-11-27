@@ -113,7 +113,7 @@ class DatabaseManager:
         """Insert new rows, update changed rows, skip identical rows.
 
         Every overwritten value is copied to `data_revisions` first (unless
-        track_revisions=False, used only for bookkeeping tables such as download_log).
+        track_revisions=False, used only for bookkeeping tables such as data_download_log).
         Runs as one transaction: either the whole batch is written or nothing is.
         """
         if table not in TABLE_KEYS:
@@ -205,7 +205,7 @@ class DatabaseManager:
         return out
 
     def insert(self, table: str, rows: pd.DataFrame | Sequence[dict[str, Any]]) -> int:
-        """Plain append for log-style tables without a natural key (data_quality_issues)."""
+        """Plain append for log-style tables without a natural key (data_validation_log)."""
         records = rows.to_dict("records") if isinstance(rows, pd.DataFrame) else list(rows)
         if not records:
             return 0
@@ -222,10 +222,10 @@ class DatabaseManager:
     def log_download(self, dataset: str, stock_id: str, start_date: str, end_date: str, status: str,
                      row_count: int = 0, http_status: int | None = None, error_message: str | None = None) -> None:
         prev = self.conn.execute(
-            "SELECT attempts FROM download_log WHERE dataset=? AND stock_id=? AND start_date=? AND end_date=?",
+            "SELECT attempts FROM data_download_log WHERE dataset=? AND stock_id=? AND start_date=? AND end_date=?",
             (dataset, stock_id, start_date, end_date),
         ).fetchone()
-        self.upsert("download_log", [{
+        self.upsert("data_download_log", [{
             "dataset": dataset, "stock_id": stock_id, "start_date": start_date, "end_date": end_date,
             "status": status, "row_count": row_count, "http_status": http_status,
             "attempts": (prev[0] + 1) if prev else 1, "error_message": error_message, "updated_at": utc_now(),
@@ -234,7 +234,7 @@ class DatabaseManager:
     def completed_downloads(self, dataset: str) -> pd.DataFrame:
         """Requests that need no retry: 'success' and 'empty' (a verified empty answer)."""
         return self.read_sql(
-            "SELECT stock_id, start_date, end_date, status, row_count FROM download_log "
+            "SELECT stock_id, start_date, end_date, status, row_count FROM data_download_log "
             "WHERE dataset = ? AND status IN ('success','empty')", (dataset,))
 
     # ---- reads ---------------------------------------------------------------------
@@ -286,7 +286,7 @@ class DatabaseManager:
     def get_trading_days(self, start: str, end: str, as_of: str, exchange: str = "TWSE") -> list[str]:
         """Trading days in [start, end], never beyond `as_of` (the provider publishes future calendars)."""
         df = self.read_sql(
-            "SELECT date FROM market_calendar WHERE exchange = ? AND is_trading_day = 1 "
+            "SELECT date FROM trading_calendar WHERE exchange = ? AND is_trading_day = 1 "
             "AND date BETWEEN ? AND ? AND date <= ? ORDER BY date",
             (exchange, start, end, as_of),
         )

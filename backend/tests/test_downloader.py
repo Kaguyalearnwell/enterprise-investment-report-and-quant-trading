@@ -229,8 +229,8 @@ def make_downloader(db, session=None, tmp=None, as_of="2026-11-27"):
 def test_reference_sync(db, tmp_path):
     dl = make_downloader(db, tmp=tmp_path / "raw")
     counts = db.row_counts()
-    assert counts["security_master"] > 10 and counts["market_calendar"] > 0 and counts["benchmark_index"] == 2
-    assert counts["data_quality_issues"] >= 1
+    assert counts["security_master"] > 10 and counts["trading_calendar"] > 0 and counts["benchmark_index"] == 2
+    assert counts["data_validation_log"] >= 1
     assert (tmp_path / "raw" / "finmind" / "TaiwanStockInfo").exists()       # raw responses archived
     assert db.get_trading_days("2026-01-01", "2027-12-31", as_of="2026-11-27")[-1] <= "2026-11-27"
 
@@ -285,10 +285,10 @@ def test_failed_request_is_logged_and_retried_next_run(db):
     sess.failures = {n0 + k: requests.ConnectionError("down") for k in range(1, 6)}   # all 5 attempts fail
     s1 = dl.download("prices", ["2330"], "2013-01-01")
     assert s1.failed == 1
-    assert db.read_sql("SELECT status, attempts FROM download_log WHERE dataset='TaiwanStockPrice'").iloc[0].tolist() == ["failed", 1]
+    assert db.read_sql("SELECT status, attempts FROM data_download_log WHERE dataset='TaiwanStockPrice'").iloc[0].tolist() == ["failed", 1]
     s2 = dl.download("prices", ["2330"], "2013-01-01")
     assert s2.success == 1
-    row = db.read_sql("SELECT status, attempts FROM download_log WHERE dataset='TaiwanStockPrice'").iloc[0].tolist()
+    row = db.read_sql("SELECT status, attempts FROM data_download_log WHERE dataset='TaiwanStockPrice'").iloc[0].tolist()
     assert row == ["success", 2]
 
 
@@ -308,7 +308,7 @@ def test_unknown_code_gets_flagged_master_row(db):
     dl.download("prices", ["2317"], "2025-07-01")
     m = db.read_sql("SELECT exchange, source FROM security_master WHERE stock_id='2317'").iloc[0].tolist()
     assert m == ["UNKNOWN", "downloader:auto"]
-    assert "not_in_any_list" in db.read_sql("SELECT category FROM data_quality_issues").category.tolist()
+    assert "not_in_any_list" in db.read_sql("SELECT category FROM data_validation_log").category.tolist()
 
 
 def test_dividends_download(db):

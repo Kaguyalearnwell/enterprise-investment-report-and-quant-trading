@@ -60,7 +60,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "status":
         for t, n in db.row_counts().items():
             print(f"{t:24s} {n:>12,d}")
-        print(db.read_sql("SELECT dataset, status, COUNT(*) AS n, SUM(row_count) AS rows FROM download_log "
+        print(db.read_sql("SELECT dataset, status, COUNT(*) AS n, SUM(row_count) AS rows FROM data_download_log "
                           "GROUP BY dataset, status ORDER BY dataset, status").to_string(index=False))
         return 0
 
