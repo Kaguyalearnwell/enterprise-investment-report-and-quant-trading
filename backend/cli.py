@@ -2,12 +2,16 @@
 
 Examples
 --------
-    python main.py init-db
-    python main.py download reference                     # stock lists, calendar, splits, benchmarks
-    python main.py download prices --stocks 2330 2317     # specific stocks
-    python main.py download prices --all --limit 10       # first 10 stocks of the universe
-    python main.py download all                           # reference + prices + dividends, whole universe
-    python main.py status
+    python -m backend.cli init-db
+    python -m backend.cli download reference                     # stock lists, calendar, splits, benchmarks
+    python -m backend.cli download prices --stocks 2330 2317     # specific stocks
+    python -m backend.cli download prices --all --limit 10       # first 10 stocks of the universe
+    python -m backend.cli download all                           # reference + prices + dividends, whole universe
+    python -m backend.cli status
+    python -m backend.cli process --stocks 2330          # adjusted prices, limits, status, weekly bars
+    python -m backend.cli validate --stocks 2330         # data-quality report -> reports/data_quality/
+    python -m backend.cli audit-survivorship             # TPEx monthly snapshots -> reports/survivorship/
+    python -m backend.cli registry                       # seed data_source_registry
 
 All downloads are incremental and resumable: re-run the same command after an
 interruption and it continues where it stopped.
@@ -20,7 +24,10 @@ import logging
 import sys
 
 from backend.config.settings import get_settings
-from backend.data.collectors.downloader import DATASETS, Downloader
+from backend.data.collectors.downloader import DATASETS, Downloader, default_as_of
+from backend.data.pipeline import DataPipeline, seed_source_registry
+from backend.data.providers.official_provider import TPExProvider
+from backend.data.validators.survivorship_audit import SurvivorshipAudit, write_survivorship_report
 from backend.data.providers.finmind_provider import FinMindProvider
 from backend.database.db_manager import DatabaseManager
 from backend.core.logger import setup_logging
@@ -45,6 +52,19 @@ def _parser() -> argparse.ArgumentParser:
     d.add_argument("--start", default=DEFAULT_START)
     d.add_argument("--end", default=None, help="default: today")
     d.add_argument("--force", action="store_true", help="re-download even if already covered")
+
+    for name, hlp in [("process", "build adjusted prices, limits, status, weekly bars"),
+                      ("validate", "run data-quality checks and write a report")]:
+        x = sub.add_parser(name, help=hlp)
+        gx = x.add_mutually_exclusive_group(required=True)
+        gx.add_argument("--stocks", nargs="+")
+        gx.add_argument("--all", action="store_true")
+    a = sub.add_parser("audit-survivorship", help="compare the universe with official TPEx monthly snapshots")
+    a.add_argument("--start", default=DEFAULT_START)
+    a.add_argument("--end", default=None)
+    sub.add_parser("registry", help="seed / refresh data_source_registry")
+    v = sub.add_parser("version", help="record a data version fingerprint")
+    v.add_argument("description")
     return p
 
 
@@ -64,9 +84,32 @@ def main(argv: list[str] | None = None) -> int:
                           "GROUP BY dataset, status ORDER BY dataset, status").to_string(index=False))
         return 0
 
+    as_of = default_as_of()
+    if args.cmd in ("process", "validate"):
+        pipe = DataPipeline(db, as_of)
+        ids = args.stocks or db.read_sql("SELECT DISTINCT stock_id FROM daily_prices_raw ORDER BY 1").stock_id.tolist()
+        if args.cmd == "process":
+            log.info("processed: %s", pipe.process(ids))
+        else:
+            run_id, md, issues = pipe.validate(None if args.all else ids, s.reports_dir / "data_quality")
+            log.info("validation %s: %d issues -> %s", run_id, len(issues), md)
+        return 0
+    if args.cmd == "audit-survivorship":
+        res = SurvivorshipAudit(db, TPExProvider(), raw_dir=s.raw_dir).run(args.start, args.end or as_of)
+        md = write_survivorship_report(res, s.reports_dir / "survivorship")
+        log.info("survivorship audit: added %d, exchange resolved %d -> %s", res["added_to_master"],
+                 res["exchange_resolved_to_tpex"], md)
+        return 0
+    if args.cmd == "registry":
+        log.info("data_source_registry rows written: %d", seed_source_registry(db))
+        return 0
+    if args.cmd == "version":
+        log.info("data version %d recorded", DataPipeline(db, as_of).snapshot_version(args.description))
+        return 0
+
     if not s.finmind_token:
         log.warning("FINMIND_TOKEN not set: anonymous limit 300 requests/hour")
-    dl = Downloader(db, FinMindProvider(token=s.finmind_token), raw_dir=s.raw_dir)
+    dl = Downloader(db, FinMindProvider(token=s.finmind_token), raw_dir=s.raw_dir, as_of=as_of)
     what = args.what
     if what in ("reference", "all"):
         for k, v in dl.sync_reference(args.start).items():
