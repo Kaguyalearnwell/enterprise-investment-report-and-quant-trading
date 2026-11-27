@@ -1,5 +1,5 @@
 {
-  "run_id": "dq-2026-11-27T07:00:12+00:00",
+  "run_id": "dq-2026-11-27T07:05:14+00:00",
   "as_of": "2026-11-26",
   "scope": [
     "2330",
@@ -18,17 +18,16 @@
     "8070"
   ],
   "summary": {
-    "total": 594,
+    "total": 575,
     "by_severity": {
-      "info": 255,
-      "error": 177,
-      "warning": 162
+      "info": 450,
+      "warning": 125
     },
     "by_check": [
       {
         "check_name": "calendar",
-        "category": "missing_trading_days",
-        "severity": "warning",
+        "category": "pre_event_halt",
+        "severity": "info",
         "n": 13
       },
       {
@@ -45,33 +44,39 @@
       },
       {
         "check_name": "ohlc_logic",
-        "category": "high_below_open_close_or_low",
-        "severity": "error",
+        "category": "pre_listing:high_below_open_close_or_low",
+        "severity": "info",
         "n": 86
       },
       {
         "check_name": "ohlc_logic",
-        "category": "low_above_open_close",
-        "severity": "error",
+        "category": "pre_listing:low_above_open_close",
+        "severity": "info",
         "n": 89
       },
       {
         "check_name": "ohlc_logic",
-        "category": "nonpositive_price",
-        "severity": "error",
+        "category": "pre_listing:nonpositive_price",
+        "severity": "info",
         "n": 2
       },
       {
         "check_name": "price_limits",
         "category": "price_outside_limits",
         "severity": "warning",
-        "n": 23
+        "n": 4
+      },
+      {
+        "check_name": "returns",
+        "category": "pre_listing:unexplained_jump",
+        "severity": "info",
+        "n": 5
       },
       {
         "check_name": "returns",
         "category": "unexplained_jump",
         "severity": "warning",
-        "n": 7
+        "n": 2
       },
       {
         "check_name": "volume",
@@ -109,19 +114,19 @@
     "chip_daily": 0,
     "chip_import_log": 0,
     "chip_margin": 0,
-    "corporate_actions": 244,
+    "corporate_actions": 290,
     "daily_prices_adj": 223716,
     "daily_prices_raw": 223716,
-    "data_download_log": 97,
-    "data_revisions": 41,
+    "data_download_log": 105,
+    "data_revisions": 249,
     "data_source_registry": 15,
-    "data_validation_log": 1811,
-    "data_versions": 0,
+    "data_validation_log": 3554,
+    "data_versions": 1,
     "disposition_history": 0,
     "industry_classification": 0,
     "price_limits": 223716,
-    "schema_migrations": 2,
-    "security_history": 1021,
+    "schema_migrations": 3,
+    "security_history": 1029,
     "security_master": 3632,
     "suspension_history": 884,
     "trading_calendar": 13824,

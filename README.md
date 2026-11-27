@@ -14,7 +14,9 @@
 | [`docs/stage2_1_data_sources.md`](docs/stage2_1_data_sources.md) | **Stage 2.1 成果**：FinMind／TWSE／TPEx 資料來源實測驗證 |
 | [`docs/stage2_2_database.md`](docs/stage2_2_database.md) | **Stage 2.2 成果**：SQLite schema、遷移、讀寫介面與測試 |
 | [`docs/platform_stage1_plan.md`](docs/platform_stage1_plan.md) | **平台 Stage 1**：全市場研究平台架構、Schema v2、Dashboard、開發計畫 |
-| [`taiwan_quant_system/`](taiwan_quant_system/) | Python 系統（目前：指標、週線濾網、訊號、23 項因果性測試） |
+| [`docs/stage2_report.md`](docs/stage2_report.md) | **Stage 2 完成報告**：資料管線、真實資料驗收、已知限制 |
+| [`docs/INSTALL.md`](docs/INSTALL.md) | 在你電腦上安裝、建立全市場資料庫、每日更新 |
+| [`backend/`](backend/) | Python 後端（資料管線、資料庫、指標、訊號；115 項測試） |
 
 ## 兩階段研究流程
 
