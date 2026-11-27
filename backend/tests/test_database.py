@@ -9,10 +9,10 @@ import sqlite3
 import pandas as pd
 import pytest
 
-from config.settings import get_settings
-from src.database.db_manager import DatabaseManager, utc_now
-from src.database.migrations import MIGRATIONS, Migration, MigrationError, apply_migrations
-from src.database.schema import REQUIRED_TABLES
+from backend.config.settings import get_settings
+from backend.database.db_manager import DatabaseManager, utc_now
+from backend.database.migrations import MIGRATIONS, Migration, MigrationError, apply_migrations
+from backend.database.schema import REQUIRED_TABLES
 
 NOW = "2026-11-27T00:00:00+00:00"
 

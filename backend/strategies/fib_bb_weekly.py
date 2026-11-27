@@ -25,8 +25,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from .indicators import bars_since_true_within, bollinger, percent_rank, sma, wilder_atr
-from .weekly_filter import weekly_filter
+from backend.indicators.core import bars_since_true_within, bollinger, percent_rank, sma, wilder_atr
+from backend.indicators.weekly import weekly_filter
 
 ADJ_COLS = {"open": "adj_open", "high": "adj_high", "low": "adj_low", "close": "adj_close", "volume": "adj_volume"}
 

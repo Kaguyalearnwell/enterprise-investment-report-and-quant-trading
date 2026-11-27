@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.signal_generator import VERSIONS, generate
+from backend.strategies.fib_bb_weekly import VERSIONS, generate
 
 
 def test_entry_E_matches_spec_formula(stock, cfg):

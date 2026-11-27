@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from src.indicators import bars_since_true_within, bollinger, percent_rank, rma, rolling_std, sma, true_range, wilder_atr
+from backend.indicators.core import bars_since_true_within, bollinger, percent_rank, rma, rolling_std, sma, true_range, wilder_atr
 
 
 def test_std_is_population_std():

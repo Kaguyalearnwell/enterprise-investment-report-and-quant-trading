@@ -19,11 +19,11 @@ import datetime as dt
 import logging
 import sys
 
-from config.settings import get_settings
-from src.data.downloader import DATASETS, Downloader
-from src.data_providers.finmind_provider import FinMindProvider
-from src.database.db_manager import DatabaseManager
-from src.utils.logger import setup_logging
+from backend.config.settings import get_settings
+from backend.data.collectors.downloader import DATASETS, Downloader
+from backend.data.providers.finmind_provider import FinMindProvider
+from backend.database.db_manager import DatabaseManager
+from backend.core.logger import setup_logging
 
 DEFAULT_START = "2013-01-01"   # weekly MA55 needs ~57 weeks of warm-up before a 2015 backtest start
 log = logging.getLogger("main")

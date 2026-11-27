@@ -13,10 +13,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]   # repository root
 sys.path.insert(0, str(ROOT))
 
-from src.config import load_config  # noqa: E402
+from backend.config.strategy_config import load_config  # noqa: E402
 
 
 def make_calendar(start="2013-01-01", end="2017-12-31") -> pd.DatetimeIndex:

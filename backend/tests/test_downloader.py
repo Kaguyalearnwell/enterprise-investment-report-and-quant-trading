@@ -13,12 +13,12 @@ import requests
 
 import datetime as dt
 
-from src.data.downloader import Downloader, default_as_of
-from src.data.security_master import build_security_master
-from src.data_providers.base_provider import DatasetNotAvailable
-from src.data_providers.finmind_provider import FinMindProvider, classify_security
-from src.database.db_manager import DatabaseManager
-from src.utils.retry import RateLimiter, TransientError, retry
+from backend.data.collectors.downloader import Downloader, default_as_of
+from backend.data.normalizers.security_master import build_security_master
+from backend.data.providers.base_provider import DatasetNotAvailable
+from backend.data.providers.finmind_provider import FinMindProvider, classify_security
+from backend.database.db_manager import DatabaseManager
+from backend.core.retry import RateLimiter, TransientError, retry
 
 FIX = Path(__file__).parent / "fixtures" / "finmind"
 PRICE_FILES = {"2330": "price_2330.json", "3068": "price_3068.json", "2317": "price_2317_noprice.json",

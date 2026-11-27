@@ -18,8 +18,8 @@ from typing import Any
 
 import pandas as pd
 
-from .migrations import apply_migrations, current_version
-from .schema import BOOKKEEPING_COLUMNS, TABLE_KEYS
+from backend.database.migrations import apply_migrations, current_version
+from backend.database.schema import BOOKKEEPING_COLUMNS, TABLE_KEYS
 
 log = logging.getLogger(__name__)
 

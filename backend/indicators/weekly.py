@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from .indicators import sma
+from backend.indicators.core import sma
 
 
 def week_key(index: pd.DatetimeIndex) -> pd.Series:

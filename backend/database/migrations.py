@@ -14,7 +14,7 @@ import logging
 import sqlite3
 from dataclasses import dataclass
 
-from .schema import SCHEMA_V1
+from backend.database.schema import SCHEMA_V1
 
 log = logging.getLogger(__name__)
 

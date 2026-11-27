@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.signal_generator import ADJ_COLS, generate
-from src.weekly_filter import resample_weekly, weekly_filter, weekly_trend, week_key
+from backend.strategies.fib_bb_weekly import ADJ_COLS, generate
+from backend.indicators.weekly import resample_weekly, weekly_filter, weekly_trend, week_key
 
 PRICE = ["open", "high", "low", "close", "adj_open", "adj_high", "adj_low", "adj_close"]
 

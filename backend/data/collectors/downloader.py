@@ -31,10 +31,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from ..data_providers.base_provider import DataProvider, DatasetNotAvailable, FetchResult, ProviderError
-from ..database.db_manager import DatabaseManager, utc_now
-from ..utils.retry import TransientError
-from .security_master import build_security_master
+from backend.data.providers.base_provider import DataProvider, DatasetNotAvailable, FetchResult, ProviderError
+from backend.database.db_manager import DatabaseManager, utc_now
+from backend.core.retry import TransientError
+from backend.data.normalizers.security_master import build_security_master
 
 log = logging.getLogger(__name__)
 
@@ -269,7 +269,7 @@ class Downloader:
     def _ensure_master(self, sid: str) -> None:
         """Prices for a code unknown to both lists (e.g. 5326) still get a master row, flagged."""
         if self.db.read_sql("SELECT 1 FROM security_master WHERE stock_id = ?", (sid,)).empty:
-            from ..data_providers.finmind_provider import classify_security
+            from backend.data.providers.finmind_provider import classify_security
 
             self.db.upsert("security_master", [{"stock_id": sid, "stock_name": None, "exchange": "UNKNOWN",
                                                 "industry_category": None, "security_type": classify_security(sid),

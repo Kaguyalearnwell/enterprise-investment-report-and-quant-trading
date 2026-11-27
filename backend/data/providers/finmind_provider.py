@@ -17,10 +17,10 @@ from typing import Any
 import pandas as pd
 import requests
 
-from config.data_sources import FINMIND_API_URL, FINMIND_MIN_INTERVAL_SECONDS, FINMIND_REQUESTS_PER_HOUR, NOT_INDUSTRY_CATEGORY
+from backend.config.data_sources import FINMIND_API_URL, FINMIND_MIN_INTERVAL_SECONDS, FINMIND_REQUESTS_PER_HOUR, NOT_INDUSTRY_CATEGORY
 
-from ..utils.retry import RateLimiter, TransientError, retry
-from .base_provider import DataProvider, DatasetNotAvailable, FetchResult, ProviderError, RateLimitExceeded
+from backend.core.retry import RateLimiter, TransientError, retry
+from backend.data.providers.base_provider import DataProvider, DatasetNotAvailable, FetchResult, ProviderError, RateLimitExceeded
 
 log = logging.getLogger(__name__)
 SOURCE = "finmind"
