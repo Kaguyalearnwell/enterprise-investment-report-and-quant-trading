@@ -205,3 +205,42 @@ def summarize(issues: pd.DataFrame) -> dict:
         "by_check": json.loads(issues.groupby(["check_name", "category", "severity"]).size()
                                .rename("n").reset_index().to_json(orient="records", force_ascii=False)),
     }
+
+
+# ---- adjusted prices ---------------------------------------------------------------------------
+def check_adjusted(adj: pd.DataFrame, raw: pd.DataFrame, actions: pd.DataFrame) -> pd.DataFrame:
+    """adj = raw * factor exactly; the factor may change only across an ex-date; continuity at each event."""
+    if adj.empty:
+        return pd.DataFrame(columns=ISSUE_COLUMNS)
+    m = adj.merge(raw[["stock_id", "date", "close", "has_price"]], on=["stock_id", "date"], how="left")
+    out = []
+    priced = m[m["has_price"] == 1]
+    ratio_bad = priced[~np.isclose(priced["adj_close"], priced["close"] * priced["price_factor"], rtol=1e-9)]
+    out.append(_issues(ratio_bad, "daily_prices_adj", "adjusted", "error", "adj_not_raw_times_factor", "exclude",
+                       "adj_close != close * price_factor"))
+    ev = set(zip(actions["stock_id"], actions["ex_date"])) if not actions.empty else set()
+    for sid, g in m.sort_values("date").groupby("stock_id"):
+        chg = g[g["price_factor"].ne(g["price_factor"].shift(1)) & g["price_factor"].shift(1).notna()]
+        # the factor drops back toward 1 on the first bar ON/AFTER an ex-date
+        stray = chg[[not any((sid, d2) in ev for d2 in _between(g, d)) for d in chg["date"]]]
+        out.append(_issues(stray, "daily_prices_adj", "adjusted", "error", "factor_change_without_event", "exclude",
+                           "price_factor changes on a day with no corporate action"))
+    return pd.concat(out, ignore_index=True)
+
+
+def _between(g: pd.DataFrame, d: str) -> list[str]:
+    """Calendar dates from the previous bar (exclusive) up to d (inclusive) - an ex-date may fall on a no-row day."""
+    prev = g["date"][g["date"] < d].max()
+    return [x for x in pd.date_range(prev, d).strftime("%Y-%m-%d") if x > prev]
+
+
+# ---- price limits ------------------------------------------------------------------------------
+def check_price_limits(raw: pd.DataFrame, limits: pd.DataFrame, tol: float = 1e-6) -> pd.DataFrame:
+    """A traded price outside [limit_down, limit_up] means the limit (or the price) is wrong."""
+    if limits.empty:
+        return pd.DataFrame(columns=ISSUE_COLUMNS)
+    m = raw[raw["has_price"] == 1].merge(limits[limits["has_limit"] == 1], on=["stock_id", "date"])
+    bad = m[(m["high"] > m["limit_up"].astype(float) + tol) | (m["low"] < m["limit_down"].astype(float) - tol)]
+    return _issues(bad, "price_limits", "price_limits", "warning", "price_outside_limits", "flag",
+                   bad.apply(lambda r: f"H={r.high} L={r.low} vs limits {r.limit_down}..{r.limit_up} "
+                                       f"(ref {r.reference_price}, {r.basis})", axis=1) if not bad.empty else "")
