@@ -1,5 +1,7 @@
 # Phase 1：策略數學定義與邏輯審核
 
+> **路徑說明（2026-11-27）**：本文件撰寫時程式位於 `taiwan_quant_system/`，Stage 2 已遷移到平台架構：`src/` → `backend/`（indicators、strategies、database、data），`config/` → `backend/config/`，`tests/` → `backend/tests/`。測試改在專案根目錄執行 `python -m pytest`。
+
 > 規格來源：[`prompts/03_taiwan_full_market_system.md`](../prompts/03_taiwan_full_market_system.md)
 > 研究設計基礎：[`docs/stage1_strategy_research.md`](stage1_strategy_research.md)
 > **狀態：程式原型／待驗證模型。** 本階段只用合成資料驗證「定義與時序正確」，**沒有任何真實市場回測，也沒有任何績效數字**。

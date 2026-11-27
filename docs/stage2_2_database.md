@@ -1,5 +1,7 @@
 # Stage 2.2：資料庫建置（Schema、索引、讀寫介面）
 
+> **路徑說明（2026-11-27）**：本文件撰寫時程式位於 `taiwan_quant_system/`，Stage 2 已遷移到平台架構：`src/` → `backend/`（indicators、strategies、database、data），`config/` → `backend/config/`，`tests/` → `backend/tests/`。測試改在專案根目錄執行 `python -m pytest`。
+
 > **狀態：Stage 2.2 完成。資料庫結構與讀寫介面已建立並通過測試；資料庫內目前沒有任何真實市場資料**（真實資料下載屬於 Stage 2.3）。
 > 程式：`taiwan_quant_system/src/database/`（`schema.py`、`migrations.py`、`db_manager.py`）
 > 測試：`taiwan_quant_system/tests/test_database.py`（22 項）

@@ -2,8 +2,8 @@
 
 > **狀態：Stage 2.1 完成。尚未下載任何正式資料，也尚未建立資料庫。**
 > 證據：
-> - 可重現的驗證腳本：[`taiwan_quant_system/scripts/verify_data_sources.py`](../taiwan_quant_system/scripts/verify_data_sources.py)
-> - 實際 API 回應摘要：[`taiwan_quant_system/reports/stage2_1_data_source_verification.json`](../taiwan_quant_system/reports/stage2_1_data_source_verification.json)（執行時間 2026-11-27 03:22 UTC，未使用 token）
+> - 可重現的驗證腳本：[`scripts/verify_data_sources.py`](../scripts/verify_data_sources.py)
+> - 實際 API 回應摘要：[`reports/stage2_1_data_source_verification.json`](../reports/stage2_1_data_source_verification.json)（執行時間 2026-11-27 03:22 UTC，未使用 token）
 > - FinMind 官方文件 `finmind.github.io`（2026-11-27 讀取）與 FinMind Python SDK 原始碼（GitHub `FinMind/FinMind`，commit `d89a84a`，2026-11-22）
 
 ---
