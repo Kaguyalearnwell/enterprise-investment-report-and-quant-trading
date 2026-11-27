@@ -1,6 +1,6 @@
 # 台股量化研究系統 使用說明書
 
-> 版本：Stage 3 完成（2026-11-27）｜適用分支：`claude/trusting-gauss-pam41z`
+> 版本：Stage 4 完成（2026-11-27）｜適用分支：`claude/trusting-gauss-pam41z`
 > 安裝步驟的完整細節另見 [`docs/INSTALL.md`](INSTALL.md)。
 
 ---
@@ -37,7 +37,7 @@
 
 ## 2. 目前能用的功能
 
-系統分階段開發，**目前完成 Stage 3（指標與策略訊號）**。開發順序見 `docs/prompt04_gap_analysis.md` §F。
+系統分階段開發，**目前完成 Stage 4（回測與投資組合模擬）**。開發順序見 `docs/prompt04_gap_analysis.md` §F。
 
 | 功能 | 狀態 | 說明 |
 |---|---|---|
@@ -47,7 +47,7 @@
 | 資料品質檢查與報告 | ✅ 可用 | `validate` |
 | 倖存者偏誤稽核（上櫃） | ✅ 可用 | `audit-survivorship` |
 | 指標與策略訊號（SMA13/34/55、布林壓縮、週線濾網，A–E、S0，兩種成交量定義） | ✅ 可用 | `signals compute / list / explain` |
-| 歷史回測、投資組合模擬（個股與全市場分開） | ⏳ 尚未開始 | Stage 4 |
+| 歷史回測、投資組合模擬（個股與全市場分開，含成本與風險限制） | ✅ 可用 | `backtest run / list / show` |
 | 2×2 因子、消融、隨機基準、DSR、PBO 等統計驗證 | ⏳ 尚未開始 | Stage 5 |
 | 基本面資料、企業與成長評級、估值、進場時機整合 | ⏳ 尚未開始 | Stage 6–8 |
 | 網頁 Dashboard、報表匯出 | ⏳ 尚未開始 | Stage 9 |
@@ -216,7 +216,29 @@ python -m backend.cli download <類型> [--stocks 代號 ... | --all] [選項]
 
 成交量兩種定義（Prompt 04 §8.2）：`include_today` = 當日量 > 1.5 × 含當日的 20 日均量（正式定義，與 TradingView 一致）；`prior_20` = 當日量 > 1.5 × 前 20 個完整交易日均量。
 
-### 6.4 處理、驗證、稽核
+### 6.4 歷史回測（模擬，不是真實交易）
+
+| 指令 | 作用 |
+|---|---|
+| `backtest run --all [選項]` | 全市場投組回測（100 萬本金、所有風險限制） |
+| `backtest run --stocks 2330 --mode single_stock` | 個股回測（獨立紀錄，不與全市場混用） |
+| `backtest list` | 所有回測紀錄（每次執行都是新紀錄，不覆蓋舊的） |
+| `backtest show 回測編號` | 該次回測的 In-Sample 績效；`--unseal` 才顯示 Validation／OOS |
+
+| 選項 | 說明 | 預設 |
+|---|---|---|
+| `--version A/B/C/D/E/S0` | 策略版本 | E |
+| `--volume-mode include_today / prior_20` | 成交量定義 | include_today |
+| `--cost optimistic / base / stress` | 成本情境（手續費 3 折／6 折／原價） | base |
+| `--slippage low / high` | 該情境滑價區間的下限或上限（樂觀 3–5、基準 5–15、壓力 15–30 bps） | low |
+| `--basis adjusted / raw` | 移動停損基礎（預設在還原價追蹤，避免除息誤觸） | adjusted |
+| `--start` / `--end` | 回測期間 | 2015-01-01 ～ 最新 |
+
+> **為什麼預設看不到 OOS**：樣本外資料只能在預先登記評估標準後看一次，否則反覆依結果調整，OOS 就不再是獨立驗證。Stage 5 會建立登記流程。
+>
+> 資料品質判定為 FAIL、或從未驗證過的股票，會自動排除於回測之外；先執行 `validate --all`。
+
+### 6.5 處理、驗證、稽核
 
 | 指令 | 作用 | 輸出 |
 |---|---|---|
@@ -324,6 +346,10 @@ pd.read_sql("""SELECT week_key, week_end, close FROM weekly_prices
 | `strategy_versions` | 策略參數快照（參數或公式一改就是新版本，舊版保留） |
 | `technical_indicators` | 每檔每日指標值 |
 | `strategy_signals`、`strategy_signals_readable` | 每檔每日每個條件是否成立、各版本是否進場；後者為可直接閱讀的檢視表 |
+| `backtest_runs` | 每次回測的設定（策略版本、成本、期間、排除股票、資料版本） |
+| `simulated_trades` | 每筆模擬交易：訊號日、進場日、進場價、初始停損、股數、出場日、出場價、出場原因、成本、股利、損益、R 倍數 |
+| `portfolio_daily`、`portfolio_positions`、`portfolio_cash` | 每日總資產／現金／曝險／投組風險；每日持倉與停損價；現金流水 |
+| `performance_metrics`、`data_quality_verdicts` | 各區段績效指標；每檔股票的 PASS／WARNING／FAIL |
 | `trading_calendar` | 交易日曆 |
 | `data_validation_log` | 每次資料品質檢查的問題 |
 | `data_revisions` | 被資料商修正過的舊值 |

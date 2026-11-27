@@ -15,11 +15,12 @@
 | [`docs/stage2_2_database.md`](docs/stage2_2_database.md) | **Stage 2.2 成果**：SQLite schema、遷移、讀寫介面與測試 |
 | [`docs/platform_stage1_plan.md`](docs/platform_stage1_plan.md) | **平台 Stage 1**：全市場研究平台架構、Schema v2、Dashboard、開發計畫 |
 | [`docs/stage2_report.md`](docs/stage2_report.md) | **Stage 2 完成報告**：資料管線、真實資料驗收、已知限制 |
+| [`docs/stage4_report.md`](docs/stage4_report.md) | **Stage 4 完成報告**：回測與投組模擬、機制驗證、In-Sample 結果 |
 | [`docs/stage3_report.md`](docs/stage3_report.md) | **Stage 3 完成報告**：指標與策略訊號、真實資料驗證 |
 | [`docs/prompt04_gap_analysis.md`](docs/prompt04_gap_analysis.md) | 修正版 Prompt（企業研究＋評級＋估值＋回測）與現有程式差異分析 |
 | [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) | **使用說明書**：功能現況、指令手冊、報告解讀、資料規則、疑難排解 |
 | [`docs/INSTALL.md`](docs/INSTALL.md) | 在你電腦上安裝、建立全市場資料庫、每日更新 |
-| [`backend/`](backend/) | Python 後端（資料管線、資料庫、指標、訊號；120 項測試） |
+| [`backend/`](backend/) | Python 後端（資料管線、資料庫、指標、訊號；149 項測試） |
 
 ## 兩階段研究流程
 
