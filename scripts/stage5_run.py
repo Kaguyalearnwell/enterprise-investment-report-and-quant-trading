@@ -133,11 +133,12 @@ def main() -> int:
     R["incremental"] = inc.to_dict("records")
 
     # ---- 5. bootstrap, Monte Carlo, cost and basis variants -------------------------------------------------
-    e_daily = abl["E"]["daily"]
-    rets = {k: rb.daily_returns(abl[k]["daily"]) for k in ("E", "D", "A")}
     boot = {}
     for seg, (a, b) in (("IS", seg_is), ("VALIDATION", seg_val)):
-        rE = rets["E"][(rets["E"].index >= a) & (rets["E"].index <= b)]
+        # same convention as the metric tables: returns WITHIN the segment (first day has no return)
+        rets = {k: rb.daily_returns(abl[k]["daily"][(abl[k]["daily"]["date"] >= a) & (abl[k]["daily"]["date"] <= b)])
+                for k in ("E", "D", "A")}
+        rE = rets["E"]
         sh = stats.bootstrap([rE.to_numpy()], stats.sharpe, n_boot=500 if args.quick else 2000, seed=1)
         out = {"sharpe": stats.sharpe(rE.to_numpy()), "sharpe_ci95": [float(np.percentile(sh, 2.5)), float(np.percentile(sh, 97.5))]}
         for other in ("D", "A"):
@@ -357,7 +358,9 @@ def write_report(R: dict, path: Path, quick: bool) -> None:
           f"- 使用者原始參數（13/34/55、2σ、20%、6 日、1.5 倍）：IS Sharpe {f(g['baseline_is_sharpe'])}，排名 {g['baseline_rank']} / {g['n_signal_combos']}，"
           f"鄰域平均 {f(g['baseline_plateau'])}",
           f"- 高原中心（挑選規則）：{g['selected_plateau']}，鄰域平均 Sharpe {f(g['selected_plateau_score'])}",
-          f"- 單點最佳：{g['best_single']}，IS Sharpe {f(g['best_single_sharpe'])}（**不採用**，可能是孤立尖峰）", "",
+          (f"- 單點最佳：{g['best_single']}，IS Sharpe {f(g['best_single_sharpe'])}（與高原中心相同）"
+           if g['best_single'] == g['selected_plateau'] else
+           f"- 單點最佳：{g['best_single']}，IS Sharpe {f(g['best_single_sharpe'])}（不採用：挑選規則是高原中心）"), "",
           "| 版本 | Validation 交易數 | 勝率 | PF | 期望值R | Sharpe | MDD |", "|---|---|---|---|---|---|---|"]
     for nm, m in (("原始參數", g["baseline_validation"]), ("高原中心", g["selected_validation"])):
         L.append(f"| {nm} | {f(m.get('trades'))} | {pct(m.get('win_rate'))} | {f(m.get('profit_factor'))} | {f(m.get('expectancy_r'))} | "
