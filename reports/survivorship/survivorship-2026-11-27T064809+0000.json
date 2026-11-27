@@ -1,0 +1,1185 @@
+{
+  "run_id": "survivorship-2026-11-27T06:48:09+00:00",
+  "start": "2013-01-01",
+  "end": "2026-11-26",
+  "snapshots": 167,
+  "tpex_common_codes_seen": 1021,
+  "added_to_master": 0,
+  "added_ids": [],
+  "exchange_resolved_to_tpex": 41,
+  "still_unknown_after_tpex": 431,
+  "monthly": [
+    {
+      "date": "2013-01-02",
+      "tpex_common": 634,
+      "in_master": 634,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2013-02-01",
+      "tpex_common": 634,
+      "in_master": 634,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2013-03-01",
+      "tpex_common": 635,
+      "in_master": 635,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2013-04-01",
+      "tpex_common": 635,
+      "in_master": 635,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2013-05-02",
+      "tpex_common": 636,
+      "in_master": 636,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2013-06-03",
+      "tpex_common": 640,
+      "in_master": 640,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2013-07-01",
+      "tpex_common": 643,
+      "in_master": 643,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2013-08-01",
+      "tpex_common": 642,
+      "in_master": 642,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2013-09-02",
+      "tpex_common": 641,
+      "in_master": 641,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2013-10-01",
+      "tpex_common": 638,
+      "in_master": 638,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2013-11-01",
+      "tpex_common": 643,
+      "in_master": 643,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2013-12-02",
+      "tpex_common": 648,
+      "in_master": 648,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2014-01-02",
+      "tpex_common": 656,
+      "in_master": 656,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2014-02-05",
+      "tpex_common": 661,
+      "in_master": 661,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2014-03-03",
+      "tpex_common": 659,
+      "in_master": 659,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2014-04-01",
+      "tpex_common": 661,
+      "in_master": 661,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2014-05-02",
+      "tpex_common": 661,
+      "in_master": 661,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2014-06-03",
+      "tpex_common": 663,
+      "in_master": 663,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2014-07-01",
+      "tpex_common": 664,
+      "in_master": 664,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2014-08-01",
+      "tpex_common": 665,
+      "in_master": 665,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2014-09-01",
+      "tpex_common": 668,
+      "in_master": 668,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2014-10-01",
+      "tpex_common": 668,
+      "in_master": 668,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2014-11-03",
+      "tpex_common": 675,
+      "in_master": 675,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2014-12-01",
+      "tpex_common": 677,
+      "in_master": 677,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2015-01-05",
+      "tpex_common": 682,
+      "in_master": 682,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2015-02-02",
+      "tpex_common": 684,
+      "in_master": 684,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2015-03-02",
+      "tpex_common": 683,
+      "in_master": 683,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2015-04-01",
+      "tpex_common": 689,
+      "in_master": 689,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2015-05-04",
+      "tpex_common": 690,
+      "in_master": 690,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2015-06-01",
+      "tpex_common": 694,
+      "in_master": 694,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2015-07-01",
+      "tpex_common": 694,
+      "in_master": 694,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2015-08-03",
+      "tpex_common": 695,
+      "in_master": 695,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2015-09-01",
+      "tpex_common": 692,
+      "in_master": 692,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2015-10-01",
+      "tpex_common": 693,
+      "in_master": 693,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2015-11-02",
+      "tpex_common": 694,
+      "in_master": 694,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2015-12-01",
+      "tpex_common": 698,
+      "in_master": 698,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2016-01-04",
+      "tpex_common": 705,
+      "in_master": 705,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2016-02-01",
+      "tpex_common": 713,
+      "in_master": 713,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2016-03-01",
+      "tpex_common": 712,
+      "in_master": 712,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2016-04-01",
+      "tpex_common": 719,
+      "in_master": 719,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2016-05-03",
+      "tpex_common": 718,
+      "in_master": 718,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2016-06-01",
+      "tpex_common": 718,
+      "in_master": 718,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2016-07-01",
+      "tpex_common": 719,
+      "in_master": 719,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2016-08-01",
+      "tpex_common": 719,
+      "in_master": 719,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2016-09-01",
+      "tpex_common": 718,
+      "in_master": 718,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2016-10-03",
+      "tpex_common": 721,
+      "in_master": 721,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2016-11-01",
+      "tpex_common": 723,
+      "in_master": 723,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2016-12-01",
+      "tpex_common": 725,
+      "in_master": 725,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2017-01-03",
+      "tpex_common": 729,
+      "in_master": 729,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2017-02-02",
+      "tpex_common": 731,
+      "in_master": 731,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2017-03-01",
+      "tpex_common": 731,
+      "in_master": 731,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2017-04-05",
+      "tpex_common": 733,
+      "in_master": 733,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2017-05-02",
+      "tpex_common": 738,
+      "in_master": 738,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2017-06-01",
+      "tpex_common": 738,
+      "in_master": 738,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2017-07-03",
+      "tpex_common": 739,
+      "in_master": 739,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2017-08-01",
+      "tpex_common": 737,
+      "in_master": 737,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2017-09-01",
+      "tpex_common": 735,
+      "in_master": 735,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2017-10-02",
+      "tpex_common": 734,
+      "in_master": 734,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2017-11-01",
+      "tpex_common": 735,
+      "in_master": 735,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2017-12-01",
+      "tpex_common": 739,
+      "in_master": 739,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2018-01-02",
+      "tpex_common": 742,
+      "in_master": 742,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2018-02-01",
+      "tpex_common": 749,
+      "in_master": 749,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2018-03-01",
+      "tpex_common": 748,
+      "in_master": 748,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2018-04-02",
+      "tpex_common": 751,
+      "in_master": 751,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2018-05-02",
+      "tpex_common": 755,
+      "in_master": 755,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2018-06-01",
+      "tpex_common": 754,
+      "in_master": 754,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2018-07-02",
+      "tpex_common": 756,
+      "in_master": 756,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2018-08-01",
+      "tpex_common": 759,
+      "in_master": 759,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2018-09-03",
+      "tpex_common": 757,
+      "in_master": 757,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2018-10-01",
+      "tpex_common": 758,
+      "in_master": 758,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2018-11-01",
+      "tpex_common": 761,
+      "in_master": 761,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2018-12-03",
+      "tpex_common": 763,
+      "in_master": 763,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2019-01-02",
+      "tpex_common": 766,
+      "in_master": 766,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2019-02-11",
+      "tpex_common": 766,
+      "in_master": 766,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2019-03-04",
+      "tpex_common": 767,
+      "in_master": 767,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2019-04-01",
+      "tpex_common": 768,
+      "in_master": 768,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2019-05-02",
+      "tpex_common": 768,
+      "in_master": 768,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2019-06-03",
+      "tpex_common": 771,
+      "in_master": 771,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2019-07-01",
+      "tpex_common": 775,
+      "in_master": 775,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2019-08-01",
+      "tpex_common": 773,
+      "in_master": 773,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2019-09-02",
+      "tpex_common": 772,
+      "in_master": 772,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2019-10-01",
+      "tpex_common": 767,
+      "in_master": 767,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2019-11-01",
+      "tpex_common": 774,
+      "in_master": 774,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2019-12-02",
+      "tpex_common": 772,
+      "in_master": 772,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2020-01-02",
+      "tpex_common": 772,
+      "in_master": 772,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2020-02-03",
+      "tpex_common": 774,
+      "in_master": 774,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2020-03-02",
+      "tpex_common": 773,
+      "in_master": 773,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2020-04-01",
+      "tpex_common": 776,
+      "in_master": 776,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2020-05-04",
+      "tpex_common": 774,
+      "in_master": 774,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2020-06-01",
+      "tpex_common": 773,
+      "in_master": 773,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2020-07-01",
+      "tpex_common": 774,
+      "in_master": 774,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2020-08-03",
+      "tpex_common": 775,
+      "in_master": 775,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2020-09-01",
+      "tpex_common": 774,
+      "in_master": 774,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2020-10-05",
+      "tpex_common": 776,
+      "in_master": 776,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2020-11-02",
+      "tpex_common": 777,
+      "in_master": 777,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2020-12-01",
+      "tpex_common": 777,
+      "in_master": 777,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2021-01-04",
+      "tpex_common": 780,
+      "in_master": 780,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2021-02-01",
+      "tpex_common": 785,
+      "in_master": 785,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2021-03-02",
+      "tpex_common": 786,
+      "in_master": 786,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2021-04-01",
+      "tpex_common": 785,
+      "in_master": 785,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2021-05-03",
+      "tpex_common": 785,
+      "in_master": 785,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2021-06-01",
+      "tpex_common": 785,
+      "in_master": 785,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2021-07-01",
+      "tpex_common": 784,
+      "in_master": 784,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2021-08-02",
+      "tpex_common": 787,
+      "in_master": 787,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2021-09-01",
+      "tpex_common": 787,
+      "in_master": 787,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2021-10-01",
+      "tpex_common": 786,
+      "in_master": 786,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2021-11-01",
+      "tpex_common": 788,
+      "in_master": 788,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2021-12-01",
+      "tpex_common": 786,
+      "in_master": 786,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2022-01-03",
+      "tpex_common": 785,
+      "in_master": 785,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2022-02-07",
+      "tpex_common": 786,
+      "in_master": 786,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2022-03-01",
+      "tpex_common": 789,
+      "in_master": 789,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2022-04-01",
+      "tpex_common": 794,
+      "in_master": 794,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2022-05-03",
+      "tpex_common": 795,
+      "in_master": 795,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2022-06-01",
+      "tpex_common": 797,
+      "in_master": 797,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2022-07-01",
+      "tpex_common": 799,
+      "in_master": 799,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2022-08-01",
+      "tpex_common": 797,
+      "in_master": 797,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2022-09-01",
+      "tpex_common": 797,
+      "in_master": 797,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2022-10-03",
+      "tpex_common": 798,
+      "in_master": 798,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2022-11-01",
+      "tpex_common": 800,
+      "in_master": 800,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2022-12-01",
+      "tpex_common": 801,
+      "in_master": 801,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2023-01-03",
+      "tpex_common": 807,
+      "in_master": 807,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2023-02-01",
+      "tpex_common": 808,
+      "in_master": 808,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2023-03-01",
+      "tpex_common": 806,
+      "in_master": 806,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2023-04-06",
+      "tpex_common": 807,
+      "in_master": 807,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2023-05-02",
+      "tpex_common": 806,
+      "in_master": 806,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2023-06-01",
+      "tpex_common": 808,
+      "in_master": 808,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2023-07-03",
+      "tpex_common": 810,
+      "in_master": 810,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2023-08-01",
+      "tpex_common": 810,
+      "in_master": 810,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2023-09-01",
+      "tpex_common": 811,
+      "in_master": 811,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2023-10-02",
+      "tpex_common": 811,
+      "in_master": 811,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2023-11-01",
+      "tpex_common": 809,
+      "in_master": 809,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2023-12-01",
+      "tpex_common": 811,
+      "in_master": 811,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2024-01-02",
+      "tpex_common": 812,
+      "in_master": 812,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2024-02-01",
+      "tpex_common": 811,
+      "in_master": 811,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2024-03-01",
+      "tpex_common": 812,
+      "in_master": 812,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2024-04-01",
+      "tpex_common": 817,
+      "in_master": 817,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2024-05-02",
+      "tpex_common": 818,
+      "in_master": 818,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2024-06-03",
+      "tpex_common": 819,
+      "in_master": 819,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2024-07-01",
+      "tpex_common": 822,
+      "in_master": 822,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2024-08-01",
+      "tpex_common": 823,
+      "in_master": 823,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2024-09-02",
+      "tpex_common": 822,
+      "in_master": 822,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2024-10-01",
+      "tpex_common": 829,
+      "in_master": 829,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2024-11-01",
+      "tpex_common": 830,
+      "in_master": 830,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2024-12-02",
+      "tpex_common": 830,
+      "in_master": 830,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2025-01-02",
+      "tpex_common": 835,
+      "in_master": 835,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2025-02-03",
+      "tpex_common": 839,
+      "in_master": 839,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2025-03-03",
+      "tpex_common": 843,
+      "in_master": 843,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2025-04-01",
+      "tpex_common": 847,
+      "in_master": 847,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2025-05-02",
+      "tpex_common": 847,
+      "in_master": 847,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2025-06-02",
+      "tpex_common": 852,
+      "in_master": 852,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2025-07-01",
+      "tpex_common": 851,
+      "in_master": 851,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2025-08-01",
+      "tpex_common": 851,
+      "in_master": 851,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2025-09-01",
+      "tpex_common": 854,
+      "in_master": 854,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2025-10-01",
+      "tpex_common": 853,
+      "in_master": 853,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2025-11-03",
+      "tpex_common": 859,
+      "in_master": 859,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2025-12-01",
+      "tpex_common": 862,
+      "in_master": 862,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2026-01-02",
+      "tpex_common": 872,
+      "in_master": 872,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2026-02-02",
+      "tpex_common": 876,
+      "in_master": 876,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2026-03-02",
+      "tpex_common": 878,
+      "in_master": 878,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2026-04-01",
+      "tpex_common": 879,
+      "in_master": 879,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2026-05-04",
+      "tpex_common": 883,
+      "in_master": 883,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2026-06-01",
+      "tpex_common": 887,
+      "in_master": 887,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2026-07-01",
+      "tpex_common": 889,
+      "in_master": 889,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2026-08-03",
+      "tpex_common": 888,
+      "in_master": 888,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2026-09-01",
+      "tpex_common": 888,
+      "in_master": 888,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2026-10-01",
+      "tpex_common": 887,
+      "in_master": 887,
+      "missing": 0,
+      "missing_ids": []
+    },
+    {
+      "date": "2026-11-02",
+      "tpex_common": 893,
+      "in_master": 893,
+      "missing": 0,
+      "missing_ids": []
+    }
+  ],
+  "min_monthly_coverage": 1.0,
+  "twse_audited": false,
+  "limitation": "TWSE (上市) was not audited: the official site blocks the development environment."
+}
