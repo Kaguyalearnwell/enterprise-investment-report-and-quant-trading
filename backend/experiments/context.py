@@ -74,6 +74,13 @@ class ExperimentContext:
                                                "atr": r.atr14_raw, "turnover": r.turnover_ma20 or 0.0})
         return out
 
+    def inputs(self) -> dict[str, pd.DataFrame]:
+        """Strategy inputs per stock, truncated at the last Validation day (for in-memory parameter grids)."""
+        from backend.strategies.runner import SignalRunner
+
+        r = SignalRunner(self.db, self.cfg, self.end)
+        return {sid: r.load_input(sid) for sid in self.ids}
+
     def eligible_pool(self) -> dict[str, list[dict]]:
         return self._to_signals(self.eligible)
 
@@ -92,9 +99,11 @@ class ExperimentContext:
 
     # ---- simulation ------------------------------------------------------------------------------
     def simulate(self, signals: dict[str, list[dict]], cost_scenario: str = "base", slippage_end: str = "low",
-                 basis: str | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
-        cost = cost_model(self.cfg, cost_scenario, slippage_end)
-        res = PortfolioEngine(self.cfg, cost, basis or self.cfg["backtest"]["trailing_basis"]).run(
+                 basis: str | None = None, cfg: dict | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
+        """cfg overrides the configuration for this simulation only (e.g. exit-parameter grid)."""
+        c = cfg or self.cfg
+        cost = cost_model(c, cost_scenario, slippage_end)
+        res = PortfolioEngine(c, cost, basis or c["backtest"]["trailing_basis"]).run(
             self.days, self.bars, signals, self.actions, self.meta)
         return pd.DataFrame(res.trades), pd.DataFrame(res.daily)
 
