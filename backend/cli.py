@@ -50,7 +50,7 @@ def _parser() -> argparse.ArgumentParser:
     d.add_argument("--market", nargs="+", choices=["TWSE", "TPEX", "UNKNOWN"], default=["TWSE", "TPEX", "UNKNOWN"])
     d.add_argument("--limit", type=int, help="only the first N stocks (testing)")
     d.add_argument("--start", default=DEFAULT_START)
-    d.add_argument("--end", default=None, help="default: today")
+    d.add_argument("--end", default=None, help="default: last final trading day (today after 18:00 Taipei, else yesterday)")
     d.add_argument("--force", action="store_true", help="re-download even if already covered")
 
     for name, hlp in [("process", "build adjusted prices, limits, status, weekly bars"),
