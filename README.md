@@ -11,6 +11,7 @@
 | [`docs/stage1_strategy_research.md`](docs/stage1_strategy_research.md) | **Stage 1 成果**：策略邏輯與數學審核（Prompt 02 第 1–9 部分） |
 | [`prompts/03_taiwan_full_market_system.md`](prompts/03_taiwan_full_market_system.md) | 台股全市場系統開發主規格（已確認參數、Phase 1–8 流程） |
 | [`docs/phase1_math_spec.md`](docs/phase1_math_spec.md) | **Phase 1 成果**：數學定義、時序表、邏輯審核、測試結果 |
+| [`docs/stage2_1_data_sources.md`](docs/stage2_1_data_sources.md) | **Stage 2.1 成果**：FinMind／TWSE／TPEx 資料來源實測驗證 |
 | [`taiwan_quant_system/`](taiwan_quant_system/) | Python 系統（目前：指標、週線濾網、訊號、23 項因果性測試） |
 
 ## 兩階段研究流程

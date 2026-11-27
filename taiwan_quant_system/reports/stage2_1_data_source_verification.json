@@ -1,0 +1,342 @@
+{
+  "run_at_utc": "2026-11-27T03:22:20.723998+00:00",
+  "token_used": false,
+  "checks": {
+    "tier:TaiwanStockPrice(per stock)": {
+      "available": true,
+      "status": 200,
+      "msg": "success",
+      "fields": [
+        "date",
+        "stock_id",
+        "Trading_Volume",
+        "Trading_money",
+        "open",
+        "max",
+        "min",
+        "close",
+        "spread",
+        "Trading_turnover"
+      ],
+      "sample": {
+        "date": "2024-01-02",
+        "stock_id": "2330",
+        "Trading_Volume": 27997826,
+        "Trading_money": 16549619798,
+        "open": 590.0,
+        "max": 593.0,
+        "min": 589.0,
+        "close": 593.0,
+        "spread": 0.0,
+        "Trading_turnover": 20667
+      }
+    },
+    "tier:TaiwanStockPrice(all stocks, one date)": {
+      "available": false,
+      "status": 400,
+      "msg": "Your level is free. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor",
+      "fields": null,
+      "sample": null
+    },
+    "tier:TaiwanStockPriceAdj": {
+      "available": false,
+      "status": 400,
+      "msg": "Your level is free. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor",
+      "fields": null,
+      "sample": null
+    },
+    "tier:TaiwanStockPriceLimit": {
+      "available": false,
+      "status": 400,
+      "msg": "Your level is free. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor",
+      "fields": null,
+      "sample": null
+    },
+    "tier:TaiwanStockSuspended": {
+      "available": false,
+      "status": 400,
+      "msg": "Your level is free. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor",
+      "fields": null,
+      "sample": null
+    },
+    "tier:TaiwanStockDispositionSecuritiesPeriod": {
+      "available": false,
+      "status": 400,
+      "msg": "Your level is free. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor",
+      "fields": null,
+      "sample": null
+    },
+    "tier:TaiwanStockDividendResult(per stock)": {
+      "available": true,
+      "status": 200,
+      "msg": "success",
+      "fields": [
+        "date",
+        "stock_id",
+        "before_price",
+        "after_price",
+        "stock_and_cache_dividend",
+        "stock_or_cache_dividend",
+        "max_price",
+        "min_price",
+        "open_price",
+        "reference_price"
+      ],
+      "sample": {
+        "date": "2024-03-18",
+        "stock_id": "2330",
+        "before_price": 753.0,
+        "after_price": 749.5,
+        "stock_and_cache_dividend": 3.499789,
+        "stock_or_cache_dividend": "息",
+        "max_price": 824.0,
+        "min_price": 675.0,
+        "open_price": 750.0,
+        "reference_price": 749.5
+      }
+    },
+    "tier:TaiwanStockCapitalReductionReferencePrice(per stock)": {
+      "available": true,
+      "status": 200,
+      "msg": "success",
+      "fields": [
+        "date",
+        "stock_id",
+        "ClosingPriceonTheLastTradingDay",
+        "PostReductionReferencePrice",
+        "LimitUp",
+        "LimitDown",
+        "OpeningReferencePrice",
+        "ExrightReferencePrice",
+        "ReasonforCapitalReduction"
+      ],
+      "sample": {
+        "date": "2013-09-18",
+        "stock_id": "2327",
+        "ClosingPriceonTheLastTradingDay": 10.2,
+        "PostReductionReferencePrice": 10.28,
+        "LimitUp": 10.95,
+        "LimitDown": 9.57,
+        "OpeningReferencePrice": 10.3,
+        "ExrightReferencePrice": -1.0,
+        "ReasonforCapitalReduction": "Cash refund"
+      }
+    },
+    "tier:TaiwanStockTotalReturnIndex": {
+      "available": true,
+      "status": 200,
+      "msg": "success",
+      "fields": [
+        "price",
+        "stock_id",
+        "date"
+      ],
+      "sample": {
+        "price": 38475.17,
+        "stock_id": "TAIEX",
+        "date": "2024-01-02"
+      }
+    },
+    "TaiwanStockInfo": {
+      "rows": 4400,
+      "unique_ids": 3191,
+      "type_counts": {
+        "twse": 2419,
+        "tpex": 1401,
+        "emerging": 580
+      },
+      "ids_with_multiple_rows": 1082,
+      "common_stock_ids_twse_tpex": 2164,
+      "has_listing_or_delisting_date_field": false,
+      "fields": [
+        "industry_category",
+        "stock_id",
+        "stock_name",
+        "type",
+        "date"
+      ]
+    },
+    "TaiwanStockDelisting": {
+      "rows": 728,
+      "date_min": "1995-09-23",
+      "date_max": "2026-11-18",
+      "fields": [
+        "date",
+        "stock_id",
+        "stock_name"
+      ],
+      "delistings_since_2013": 254,
+      "delisted_ids_also_in_info": 256,
+      "has_market_field": false
+    },
+    "TaiwanStockTradingDate": {
+      "rows": 7177,
+      "min": "1999-01-05",
+      "max": "2027-12-30",
+      "dates_after_today": 265,
+      "weekend_trading_dates_since_2013": [
+        "2013-02-23",
+        "2013-09-14",
+        "2014-12-27",
+        "2016-01-30",
+        "2016-06-04",
+        "2016-09-10",
+        "2017-02-18",
+        "2017-06-03",
+        "2017-09-30",
+        "2018-03-31",
+        "2018-12-22"
+      ]
+    },
+    "delisted_price_probe": {
+      "3068": {
+        "rows": 1580,
+        "first": "2012-01-02",
+        "last": "2018-06-06",
+        "in_delisting_table": [
+          {
+            "date": "2018-06-13",
+            "stock_id": "3068",
+            "stock_name": "美磊科技股份有限公司"
+          }
+        ],
+        "in_info": false
+      },
+      "6022": {
+        "rows": 1386,
+        "first": "2012-01-02",
+        "last": "2017-08-21",
+        "in_delisting_table": [
+          {
+            "date": "2017-08-28",
+            "stock_id": "6022",
+            "stock_name": "大眾綜合證券股份有限公司"
+          }
+        ],
+        "in_info": false
+      },
+      "1333": {
+        "rows": 2017,
+        "first": "2012-01-02",
+        "last": "2020-04-06",
+        "in_delisting_table": [
+          {
+            "date": "2020-11-17",
+            "stock_id": "1333",
+            "stock_name": "恩得利工業股份有限公司"
+          }
+        ],
+        "in_info": false
+      },
+      "3291": {
+        "rows": 1166,
+        "first": "2012-01-02",
+        "last": "2016-09-26",
+        "in_delisting_table": [
+          {
+            "date": "2016-10-06",
+            "stock_id": "3291",
+            "stock_name": "遠翔科技股份有限公司"
+          }
+        ],
+        "in_info": false
+      },
+      "5326": {
+        "rows": 670,
+        "first": "2012-01-02",
+        "last": "2014-09-18",
+        "in_delisting_table": [],
+        "in_info": false
+      }
+    },
+    "volume_unit": {
+      "2330_2024-01-02_Trading_Volume": 27997826,
+      "interpretation": "shares (≈28k board lots); Trading_turnover = number of trades"
+    },
+    "survivorship_crosscheck_tpex": {
+      "2013-03-01": {
+        "tpex_common": 635,
+        "missing_from_finmind_lists": [
+          "5326"
+        ],
+        "only_in_delisting_table": 44
+      },
+      "2016-01-04": {
+        "tpex_common": 705,
+        "missing_from_finmind_lists": [],
+        "only_in_delisting_table": 36
+      },
+      "2019-07-01": {
+        "tpex_common": 775,
+        "missing_from_finmind_lists": [],
+        "only_in_delisting_table": 11
+      },
+      "2022-07-01": {
+        "tpex_common": 799,
+        "missing_from_finmind_lists": [],
+        "only_in_delisting_table": 0
+      }
+    },
+    "twse_history_endpoint": {
+      "http": 307,
+      "blocked_by_waf": true
+    },
+    "twse_openapi_latest_only": {
+      "error": "ConnectionError(ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))"
+    }
+  },
+  "failed_or_gated_calls": [
+    {
+      "dataset": "TaiwanStockPrice",
+      "params": {
+        "start_date": "2024-01-02"
+      },
+      "http": 400,
+      "msg": "Your level is free. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor",
+      "attempt": 1
+    },
+    {
+      "dataset": "TaiwanStockPriceAdj",
+      "params": {
+        "data_id": "2330",
+        "start_date": "2024-01-02",
+        "end_date": "2024-01-05"
+      },
+      "http": 400,
+      "msg": "Your level is free. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor",
+      "attempt": 1
+    },
+    {
+      "dataset": "TaiwanStockPriceLimit",
+      "params": {
+        "data_id": "2330",
+        "start_date": "2024-01-02",
+        "end_date": "2024-01-05"
+      },
+      "http": 400,
+      "msg": "Your level is free. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor",
+      "attempt": 1
+    },
+    {
+      "dataset": "TaiwanStockSuspended",
+      "params": {
+        "start_date": "2024-01-01",
+        "end_date": "2024-02-01"
+      },
+      "http": 400,
+      "msg": "Your level is free. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor",
+      "attempt": 1
+    },
+    {
+      "dataset": "TaiwanStockDispositionSecuritiesPeriod",
+      "params": {
+        "data_id": "6477",
+        "start_date": "2025-01-01",
+        "end_date": "2025-02-01"
+      },
+      "http": 400,
+      "msg": "Your level is free. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor",
+      "attempt": 1
+    }
+  ]
+}
