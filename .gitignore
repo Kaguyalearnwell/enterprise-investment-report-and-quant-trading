@@ -1,0 +1,4 @@
+__pycache__/
+.pytest_cache/
+taiwan_quant_system/data/*
+!taiwan_quant_system/data/.gitkeep
