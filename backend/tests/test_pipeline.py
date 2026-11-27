@@ -32,7 +32,9 @@ def test_pipeline_end_to_end(tmp_path):
     lim = db.read_sql("SELECT basis FROM price_limits WHERE stock_id='2330' AND date='2024-06-13'").basis[0]
     assert lim == "official_event"
     run_id, md, issues = pipe.validate(["2330", "3068", "2317"], tmp_path / "reports")
-    assert md.exists() and "資料品質報告" in md.read_text()
+    assert md.exists() and "資料品質報告" in md.read_text() and "判定：" in md.read_text()
+    v = db.latest_verdicts(["2330", "3068", "2317"])
+    assert set(v.stock_id) == {"2330", "3068", "2317"} and set(v.verdict) <= {"PASS", "WARNING", "FAIL"}
     errors = issues[issues.severity == "error"]
     assert errors[errors.check_name.isin(["adjusted", "weekly", "ohlc_logic"])].empty, errors.to_string()
     # re-processing is idempotent

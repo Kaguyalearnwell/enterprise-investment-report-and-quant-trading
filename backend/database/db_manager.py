@@ -294,3 +294,12 @@ class DatabaseManager:
 
     def row_counts(self) -> dict[str, int]:
         return {t: int(self.conn.execute(f'SELECT COUNT(*) FROM "{t}"').fetchone()[0]) for t in self.tables()}
+
+    def latest_verdicts(self, stock_ids: Sequence[str] | None = None) -> pd.DataFrame:
+        """Most recent PASS/WARNING/FAIL verdict per stock (latest data-quality run that covered it)."""
+        df = self.read_sql(
+            """SELECT v.stock_id, v.verdict, v.reasons, v.run_id, v.created_at FROM data_quality_verdicts v
+               JOIN (SELECT stock_id, MAX(created_at) m FROM data_quality_verdicts GROUP BY stock_id) x
+                 ON x.stock_id = v.stock_id AND x.m = v.created_at""")
+        df = df.drop_duplicates("stock_id", keep="last")
+        return df[df["stock_id"].isin(stock_ids)] if stock_ids else df

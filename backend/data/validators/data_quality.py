@@ -52,8 +52,17 @@ class DataQualityValidator:
         issues = checks.reclassify(issues, master, actions, days)
         if not issues.empty:
             self.db.insert("data_validation_log", issues.assign(run_id=run_id, created_at=utc_now()))
+        ids = list(stock_ids) if stock_ids else sorted(prices["stock_id"].unique())
+        v = checks.verdicts(issues, ids)
+        if not v.empty:
+            self.db.insert("data_quality_verdicts", v.assign(run_id=run_id, created_at=utc_now()))
         log.info("data quality run %s: %d issues", run_id, len(issues))
         return run_id, issues
+
+    def _verdict_line(self, run_id: str) -> str:
+        v = self.db.read_sql("SELECT verdict, COUNT(*) n FROM data_quality_verdicts WHERE run_id = ? GROUP BY 1",
+                             (run_id,))
+        return "、".join(f"{r.verdict} {r.n} 檔" for r in v.itertuples()) or "無"
 
     def write_report(self, run_id: str, issues: pd.DataFrame, out_dir: Path, scope: Sequence[str] | None) -> Path:
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -65,7 +74,8 @@ class DataQualityValidator:
             f"- 資料截止日（as-of）：{self.as_of}",
             f"- 檢查範圍：{'、'.join(scope) if scope else '全部股票'}",
             f"- 問題總數：{summ['total']}（{', '.join(f'{k}: {v}' for k, v in summ['by_severity'].items()) or '無'}）",
-            "- 原則：檢查只分類與記錄，**不刪除任何資料**；`action` 為建議處置（keep／flag／exclude）。", "",
+            "- 原則：檢查只分類與記錄，**不刪除任何資料**；`action` 為建議處置（keep／flag／exclude）。",
+            f"- 判定：{self._verdict_line(run_id)}（FAIL 不得用於正式回測；WARNING 須揭露限制）", "",
             "## 各檢查結果", "", "| 檢查 | 類別 | 嚴重度 | 筆數 |", "|---|---|---|---|",
         ]
         for r in summ["by_check"]:

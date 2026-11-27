@@ -307,3 +307,21 @@ def reclassify(issues: pd.DataFrame, master: pd.DataFrame, actions: pd.DataFrame
                     out.at[i, "detail"] = f"{det}; trading halt before {e} corporate action"
                     break
     return out
+
+
+# ---- PASS / WARNING / FAIL (Prompt 04 §14.2) -------------------------------------------------------
+def verdicts(issues: pd.DataFrame, stock_ids: list[str]) -> pd.DataFrame:
+    """One verdict per stock: FAIL = an unresolved error (not usable for a formal backtest);
+    WARNING = usable once the limitation is disclosed; PASS = no error or warning."""
+    rows = []
+    for sid in stock_ids:
+        x = issues[issues["stock_id"] == sid] if not issues.empty else issues
+        n_e = int((x["severity"] == "error").sum()) if not x.empty else 0
+        n_w = int((x["severity"] == "warning").sum()) if not x.empty else 0
+        n_i = int((x["severity"] == "info").sum()) if not x.empty else 0
+        verdict = "FAIL" if n_e else "WARNING" if n_w else "PASS"
+        top = x[x["severity"].isin(["error", "warning"])]["category"].value_counts().head(5) if not x.empty else []
+        reasons = ", ".join(f"{k}×{v}" for k, v in top.items()) if len(top) else None
+        rows.append({"stock_id": sid, "verdict": verdict, "n_error": n_e, "n_warning": n_w, "n_info": n_i,
+                     "reasons": reasons})
+    return pd.DataFrame(rows)

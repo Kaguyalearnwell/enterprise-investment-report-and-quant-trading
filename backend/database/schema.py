@@ -540,3 +540,114 @@ TABLE_KEYS.update({
     "strategy_signals": ("stock_id", "date", "strategy_version_id"),
 })
 REQUIRED_TABLES = REQUIRED_TABLES + ("strategy_versions", "technical_indicators", "strategy_signals")
+
+
+# =====================================================================================
+# Schema v5 (Stage 4): backtests and data-quality verdicts. Runs are append-only:
+# a re-run gets a new run_id, earlier runs are never overwritten.
+# =====================================================================================
+SCHEMA_V5: list[str] = [
+    f"""
+    CREATE TABLE data_quality_verdicts (
+        run_id     TEXT NOT NULL,
+        stock_id   TEXT NOT NULL,
+        verdict    TEXT NOT NULL CHECK (verdict IN ('PASS','WARNING','FAIL')),
+        n_error    INTEGER NOT NULL, n_warning INTEGER NOT NULL, n_info INTEGER NOT NULL,
+        reasons    TEXT,
+        {_ts('created_at')},
+        PRIMARY KEY (run_id, stock_id)
+    ) STRICT
+    """,
+    "CREATE INDEX ix_dq_verdicts_stock ON data_quality_verdicts (stock_id, created_at)",
+    f"""
+    CREATE TABLE backtest_runs (
+        run_id              TEXT NOT NULL PRIMARY KEY,
+        {_ts('created_at')},
+        mode                TEXT NOT NULL CHECK (mode IN ('portfolio','single_stock')),
+        strategy_version_id TEXT NOT NULL REFERENCES strategy_versions (strategy_version_id),
+        entry_version       TEXT NOT NULL CHECK (entry_version IN ('A','B','C','D','E','S0')),
+        {_date('start_date')},
+        {_date('end_date')},
+        universe_size       INTEGER NOT NULL,
+        excluded            TEXT CHECK (excluded IS NULL OR json_valid(excluded)),
+        cost_scenario       TEXT NOT NULL,
+        slippage_bps        REAL NOT NULL,
+        trailing_basis      TEXT NOT NULL CHECK (trailing_basis IN ('adjusted','raw')),
+        params              TEXT NOT NULL CHECK (json_valid(params)),
+        data_version_id     INTEGER,
+        code_version        TEXT NOT NULL,
+        status              TEXT NOT NULL CHECK (status IN ('formal','exploratory')),
+        notes               TEXT
+    ) STRICT
+    """,
+    f"""
+    CREATE TABLE simulated_trades (
+        run_id          TEXT NOT NULL REFERENCES backtest_runs (run_id),
+        trade_id        INTEGER NOT NULL,
+        stock_id        TEXT NOT NULL,
+        stock_name      TEXT,
+        industry        TEXT,
+        {_date('signal_date')},
+        {_date('entry_date')},
+        entry_price     REAL NOT NULL,
+        initial_stop    REAL NOT NULL,
+        shares          REAL NOT NULL,
+        invested        REAL NOT NULL,
+        {_date('exit_date', True)},
+        exit_price      REAL,
+        exit_reason     TEXT,
+        costs           REAL NOT NULL,
+        dividends       REAL NOT NULL DEFAULT 0,
+        pnl             REAL,
+        return_pct      REAL,
+        r_multiple      REAL,
+        holding_days    INTEGER,
+        is_closed       INTEGER NOT NULL CHECK (is_closed IN (0,1)),
+        PRIMARY KEY (run_id, trade_id)
+    ) STRICT
+    """,
+    f"""
+    CREATE TABLE portfolio_daily (
+        run_id TEXT NOT NULL REFERENCES backtest_runs (run_id),
+        {_date('date')},
+        equity REAL NOT NULL, cash REAL NOT NULL, market_value REAL NOT NULL,
+        exposure REAL NOT NULL, open_risk REAL NOT NULL, n_positions INTEGER NOT NULL,
+        realized_pnl REAL NOT NULL, unrealized_pnl REAL NOT NULL,
+        PRIMARY KEY (run_id, date)
+    ) STRICT, WITHOUT ROWID
+    """,
+    f"""
+    CREATE TABLE portfolio_positions (
+        run_id TEXT NOT NULL REFERENCES backtest_runs (run_id),
+        {_date('date')},
+        stock_id TEXT NOT NULL,
+        trade_id INTEGER NOT NULL,
+        shares REAL NOT NULL, last_price REAL NOT NULL, market_value REAL NOT NULL,
+        stop_price REAL NOT NULL, unrealized_pnl REAL NOT NULL, priced_today INTEGER NOT NULL,
+        PRIMARY KEY (run_id, date, stock_id)
+    ) STRICT, WITHOUT ROWID
+    """,
+    f"""
+    CREATE TABLE portfolio_cash (
+        run_id TEXT NOT NULL REFERENCES backtest_runs (run_id),
+        seq INTEGER NOT NULL,
+        {_date('date')},
+        kind TEXT NOT NULL CHECK (kind IN ('initial','buy','sell','commission','tax','dividend')),
+        amount REAL NOT NULL,
+        stock_id TEXT,
+        trade_id INTEGER,
+        PRIMARY KEY (run_id, seq)
+    ) STRICT
+    """,
+    """
+    CREATE TABLE performance_metrics (
+        run_id  TEXT NOT NULL REFERENCES backtest_runs (run_id),
+        segment TEXT NOT NULL,
+        metric  TEXT NOT NULL,
+        value   REAL,
+        PRIMARY KEY (run_id, segment, metric)
+    ) STRICT
+    """,
+]
+REQUIRED_TABLES = REQUIRED_TABLES + ("data_quality_verdicts", "backtest_runs", "simulated_trades", "portfolio_daily",
+                                     "portfolio_positions", "portfolio_cash", "performance_metrics")

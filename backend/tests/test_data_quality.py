@@ -81,3 +81,14 @@ def test_before_price_mismatch():
 def test_stock_id_format():
     m = pd.DataFrame({"stock_id": ["2330", "23300", "0050"], "security_type": ["common", "common", "etf"]})
     assert checks.check_stock_ids(m).stock_id.tolist() == ["23300"]
+
+
+def test_verdicts():
+    issues = pd.DataFrame([
+        {"stock_id": "1111", "severity": "error", "category": "partial_ohlc"},
+        {"stock_id": "2222", "severity": "warning", "category": "unexplained_jump"},
+        {"stock_id": "2222", "severity": "info", "category": "no_trade"},
+        {"stock_id": "3333", "severity": "info", "category": "pre_listing:low_above_open_close"},
+    ])
+    v = checks.verdicts(issues, ["1111", "2222", "3333", "4444"]).set_index("stock_id")["verdict"].to_dict()
+    assert v == {"1111": "FAIL", "2222": "WARNING", "3333": "PASS", "4444": "PASS"}

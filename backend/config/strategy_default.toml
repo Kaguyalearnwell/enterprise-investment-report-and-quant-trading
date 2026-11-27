@@ -56,20 +56,34 @@ commission_rate = 0.001425
 min_commission = 20                # NT$, typical broker minimum for board lots
 sell_tax_rate = 0.003              # ordinary shares, swing trading (NOT the day-trade rate)
 
+# Prompt 04 §9.4: one-way slippage is a RANGE per scenario; backtests run both ends.
 [costs.optimistic]
 commission_discount = 0.30
-slippage_bps = 3
+slippage_bps = [3, 5]
 
 [costs.base]
 commission_discount = 0.60
-slippage_bps = 5
+slippage_bps = [5, 15]
 
 [costs.stress]
 commission_discount = 1.00
-slippage_bps = 15
+slippage_bps = [15, 30]
 
 [split]
 in_sample = 0.60
 validation = 0.20
 out_of_sample = 0.20
 embargo_bars = 40                  # >= time-stop horizon
+
+[backtest]
+# Research defaults from docs/phase1_math_spec.md §5 (still to be confirmed by the user, see platform plan §5)
+entry_method = "next_open"            # signal at close t -> market order at open t+1
+signal_rank = "random"                # same-day signals beyond capacity: "random" (seeded) or "turnover"
+random_seed = 20261127
+whole_lots_until = "2020-10-26"       # intraday odd-lot trading started 2020-10-26: before it, only 1,000-share lots
+board_lot = 1000
+odd_lot_extra_slippage_bps = 10
+trailing_basis = "adjusted"           # user decision C1: track highest close on adjusted prices, trigger in raw prices
+delisted_exit = "last_close"          # position in a delisted stock is closed at its last published close
+risk_free_rate = 0.0                  # annual, for Sharpe / Sortino
+require_quality_verdict = true        # stocks without a PASS/WARNING verdict are excluded (Prompt 04 §14.2)
