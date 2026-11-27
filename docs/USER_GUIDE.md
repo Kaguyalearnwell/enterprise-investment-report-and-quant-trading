@@ -1,6 +1,6 @@
 # 台股量化研究系統 使用說明書
 
-> 版本：Stage 4 完成（2026-11-27）｜適用分支：`claude/trusting-gauss-pam41z`
+> 版本：Stage 5 完成、Stage 6.1 完成（2026-11-28）｜適用分支：`claude/trusting-gauss-pam41z`
 > 安裝步驟的完整細節另見 [`docs/INSTALL.md`](INSTALL.md)。
 
 ---
@@ -37,7 +37,7 @@
 
 ## 2. 目前能用的功能
 
-系統分階段開發，**目前完成 Stage 4（回測與投資組合模擬）**。開發順序見 `docs/prompt04_gap_analysis.md` §F。
+系統分階段開發，**目前完成 Stage 5（統計驗證）與 Stage 6.1（基本面資料來源驗證）**。開發順序見 `docs/prompt04_gap_analysis.md` §F。
 
 | 功能 | 狀態 | 說明 |
 |---|---|---|
@@ -48,7 +48,7 @@
 | 倖存者偏誤稽核（上櫃） | ✅ 可用 | `audit-survivorship` |
 | 指標與策略訊號（SMA13/34/55、布林壓縮、週線濾網，A–E、S0，兩種成交量定義） | ✅ 可用 | `signals compute / list / explain` |
 | 歷史回測、投資組合模擬（個股與全市場分開，含成本與風險限制） | ✅ 可用 | `backtest run / list / show` |
-| 2×2 因子、消融、隨機基準、DSR、PBO 等統計驗證 | ⏳ 尚未開始 | Stage 5 |
+| 2×2 因子、消融、隨機基準、DSR、PBO 等統計驗證 | ✅ 可用（OOS 封存中） | `python scripts/stage5_run.py` |
 | 基本面資料、企業與成長評級、估值、進場時機整合 | ⏳ 尚未開始 | Stage 6–8 |
 | 網頁 Dashboard、報表匯出 | ⏳ 尚未開始 | Stage 9 |
 | TradingView Pine Script 指標 | ⏳ 尚未開始 | Stage 3 之後 |
