@@ -46,6 +46,21 @@ DATASETS = {
 }
 
 
+TAIPEI = dt.timezone(dt.timedelta(hours=8))
+SAFE_AFTER_HOUR = 18   # FinMind docs: TaiwanStockPrice updated Mon-Fri 17:30 Taipei time
+
+
+def default_as_of(now: dt.datetime | None = None) -> str:
+    """Last date whose daily data is final: today after 18:00 Taipei time, else yesterday.
+
+    Before the vendor's documented update time, today's bar may be provisional
+    (Stage 2.3 live test saw a same-day bar at 14:23 Taipei time).
+    """
+    now = (now or dt.datetime.now(dt.UTC)).astimezone(TAIPEI)
+    day = now.date() if now.hour >= SAFE_AFTER_HOUR else now.date() - dt.timedelta(days=1)
+    return day.isoformat()
+
+
 def _d(s: str) -> dt.date:
     return dt.date.fromisoformat(s)
 
@@ -73,7 +88,7 @@ class Downloader:
     def __init__(self, db: DatabaseManager, provider: DataProvider, raw_dir: Path | None = None,
                  as_of: str | None = None, clock: Callable[[], float] = time.monotonic):
         self.db, self.provider, self.raw_dir = db, provider, raw_dir
-        self.as_of = as_of or dt.date.today().isoformat()
+        self.as_of = as_of or default_as_of()
         self._clock = clock
 
     # ---- raw archive -----------------------------------------------------------------

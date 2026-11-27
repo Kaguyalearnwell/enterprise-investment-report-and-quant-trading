@@ -11,7 +11,9 @@ import pandas as pd
 import pytest
 import requests
 
-from src.data.downloader import Downloader
+import datetime as dt
+
+from src.data.downloader import Downloader, default_as_of
 from src.data.security_master import build_security_master
 from src.data_providers.base_provider import DatasetNotAvailable
 from src.data_providers.finmind_provider import FinMindProvider, classify_security
@@ -314,3 +316,9 @@ def test_dividends_download(db):
     s = dl.download("dividends", ["2330", "3068", "2317"], "2010-01-01")
     assert s.success == 2 and s.empty == 1      # 2317 has no fixture -> verified empty answer
     assert db.read_sql("SELECT COUNT(*) n FROM corporate_actions WHERE stock_id='3068'").n[0] == 8
+
+
+def test_default_as_of_waits_for_vendor_update():
+    utc = dt.timezone.utc
+    assert default_as_of(dt.datetime(2026, 11, 27, 6, 23, tzinfo=utc)) == "2026-11-26"    # 14:23 Taipei
+    assert default_as_of(dt.datetime(2026, 11, 27, 10, 5, tzinfo=utc)) == "2026-11-27"    # 18:05 Taipei

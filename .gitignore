@@ -5,3 +5,4 @@ __pycache__/
 taiwan_quant_system/data/**
 !taiwan_quant_system/data/**/
 !taiwan_quant_system/data/**/.gitkeep
+taiwan_quant_system/reports/logs/
