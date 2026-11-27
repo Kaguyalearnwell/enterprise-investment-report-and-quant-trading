@@ -244,3 +244,20 @@ def check_price_limits(raw: pd.DataFrame, limits: pd.DataFrame, tol: float = 1e-
     return _issues(bad, "price_limits", "price_limits", "warning", "price_outside_limits", "flag",
                    bad.apply(lambda r: f"H={r.high} L={r.low} vs limits {r.limit_down}..{r.limit_up} "
                                        f"(ref {r.reference_price}, {r.basis})", axis=1) if not bad.empty else "")
+
+
+# ---- weekly bars ------------------------------------------------------------------------------
+def check_weekly(stored: pd.DataFrame, rebuilt: pd.DataFrame) -> pd.DataFrame:
+    """Stored weekly bars must equal a fresh aggregation of the stored daily bars."""
+    if stored.empty and rebuilt.empty:
+        return pd.DataFrame(columns=ISSUE_COLUMNS)
+    k = ["stock_id", "week_key", "price_basis"]
+    m = stored.merge(rebuilt, on=k, how="outer", suffixes=("", "_new"), indicator=True)
+    cols = ["open", "high", "low", "close", "volume"]
+    diff = m[(m["_merge"] != "both") | ~pd.concat(
+        [pd.Series(np.isclose(m[c].astype(float), m[f"{c}_new"].astype(float), rtol=1e-12, equal_nan=True))
+         for c in cols], axis=1).all(axis=1).to_numpy()]
+    diff = diff.assign(date=diff["week_end"].fillna(diff.get("week_end_new")))
+    return _issues(diff, "weekly_prices", "weekly", "error", "weekly_aggregation_mismatch", "exclude",
+                   diff.apply(lambda r: f"week {r.week_key} {r.price_basis}: {r._merge}", axis=1)
+                   if not diff.empty else "")
