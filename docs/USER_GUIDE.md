@@ -49,7 +49,9 @@
 | 指標與策略訊號（SMA13/34/55、布林壓縮、週線濾網，A–E、S0，兩種成交量定義） | ✅ 可用 | `signals compute / list / explain` |
 | 歷史回測、投資組合模擬（個股與全市場分開，含成本與風險限制） | ✅ 可用 | `backtest run / list / show` |
 | 2×2 因子、消融、隨機基準、DSR、PBO 等統計驗證 | ✅ 可用（OOS 封存中） | `python scripts/stage5_run.py` |
-| 基本面資料、企業與成長評級、估值、進場時機整合 | ⏳ 尚未開始 | Stage 6–8 |
+| 基本面資料（財報三表、月營收、股利政策、PER/PBR，含「最早可用日」） | ✅ 可用 | `download fundamentals` |
+| 時點正確的財務指標（TTM 營收成長、毛利率、ROE、FCF、盈餘品質等） | ✅ 程式可用（尚無指令／頁面） | `backend/research/financial_metrics.py` |
+| 企業與成長評級、估值、進場時機整合 | ⏳ 尚未開始 | Stage 7–8 |
 | 網頁 Dashboard、報表匯出 | ⏳ 尚未開始 | Stage 9 |
 | TradingView Pine Script 指標 | ⏳ 尚未開始 | Stage 3 之後 |
 | 籌碼資料手動匯入 | ⏳ 資料表已建立，匯入介面尚未開發 | 你的 APP 無匯出功能，只會做手動匯入 |
@@ -191,6 +193,11 @@ python -m backend.cli download <類型> [--stocks 代號 ... | --all] [選項]
 | `dividends` | 除權息結果（含官方參考價與當日漲跌停） | 是 |
 | `capital-reductions` | 減資恢復買賣參考價 | 是（建議只查需要的股票） |
 | `all` | `reference` + 全股票池的 `prices` + `dividends` | 否（自動全市場） |
+| `income` / `balance` / `cashflow` | 綜合損益表（單季）／資產負債表／現金流量表（**年初至今累計**） | 是 |
+| `revenue` | 月營收 | 是 |
+| `dividend-policy` | 股利政策（含公告日期，分列現金與股票股利） | 是 |
+| `per` | 每日本益比、股價淨值比、殖利率 | 是 |
+| `fundamentals` | 以上 6 種一次下載（每檔 6 次請求） | 是 |
 
 | 選項 | 說明 | 預設 |
 |---|---|---|
